@@ -7,6 +7,6 @@ Gem::Specification.new do |s|
   s.description = 'A Ruby API to use the Razberry ZWave ZWay interface'
   s.email = 'vincentoo@yahoo.com'
   s.homepage = 'https://github.com/rzwaveway'
-  s.files = `git ls-files`.split('\n')
+  s.files = `git ls-files`.split("\n")
   s.has_rdoc = false
 end
