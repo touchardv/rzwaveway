@@ -1,9 +1,19 @@
 require 'uri'
+require 'log4r'
 require 'net/http'
 require 'json'
 
 module RZWaveWay
   class ZWay
+    include Log4r
+
+    def self.init
+      $log = Logger.new 'RZWaveWay'
+      outputter = Outputter.stdout
+      outputter.formatter = PatternFormatter.new(:pattern => "[%l] %d - %m")
+      $log.outputters = Outputter.stdout
+    end
+
     def initialize hostname
       @devices = {}
       @update_time = "0"
@@ -36,7 +46,7 @@ module RZWaveWay
         if @devices[id]
           events.concat (@devices[id].process updates)
         else
-          puts "Could not find device with id '#{id}'"
+          $log.warn "Could not find device with id '#{id}'"
         end
       end
       events.each do |event|
@@ -44,7 +54,7 @@ module RZWaveWay
         if handler
           handler.call(event)
         else
-          puts "no handler for #{event.class}"
+          $log.warn "no handler for #{event.class}"
         end
       end
       events
@@ -73,7 +83,7 @@ module RZWaveWay
           device_updates << [match_data.post_match, value]
           updates_per_device[device_id] = device_updates
         else
-          puts "? #{key}"
+          $log.warn "? #{key}"
         end
       end
       updates_per_device

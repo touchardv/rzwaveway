@@ -1,7 +1,5 @@
 require 'json'
 
-require_relative 'command_classes'
-
 module RZWaveWay
   class ZWaveDevice
     include CommandClasses
@@ -11,7 +9,7 @@ module RZWaveWay
     def initialize(id, data)
       @id = id
       @command_classes = create_commandclasses_from data
-      puts "Created ZWaveDevice with id='#{id}'"
+      $log.info "Created ZWaveDevice with id='#{id}'"
     end
 
     def create_commandclasses_from data
@@ -56,7 +54,8 @@ module RZWaveWay
         if @command_classes.has_key? cc
           events << (@command_classes[cc].process(values, @id))
         else
-          puts "Could not find command class: '#{cc}'"
+          $log.warn "Could not find command class: '#{cc}'"
+        end
       end
       events
     end
@@ -71,11 +70,10 @@ module RZWaveWay
           cc_updates << [match_data.post_match, value]
           updates_per_commandclass[command_class] = cc_updates
         else
-          puts "? #{key}" unless key.match(/\Adata./)
+          $log.warn "? #{key}" unless key.match(/\Adata./)
         end
       end
       updates_per_commandclass
     end
-
   end
 end

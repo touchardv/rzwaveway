@@ -9,4 +9,16 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/rzwaveway'
   s.files = `git ls-files`.split("\n")
   s.has_rdoc = false
+
+  dependencies = [
+    [:runtime,     "log4r",  "~> 1.1.10"]
+  ]
+
+  dependencies.each do |type, name, version|
+    if s.respond_to?("add_#{type}_dependency")
+      s.send("add_#{type}_dependency", name, version)
+    else
+      s.add_dependency(name, version)
+    end
+  end
 end

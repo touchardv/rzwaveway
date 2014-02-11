@@ -1,6 +1,3 @@
-require 'pp'
-require_relative 'events'
-
 module RZWaveWay
   module CommandClasses
     SENSOR_BINARY = 48
