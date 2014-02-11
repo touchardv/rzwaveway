@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "rzwaveway"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.authors = ["Vincent Touchard"]
   s.date = %q{2014-02-08}
   s.summary = 'ZWave API for ZWay'
