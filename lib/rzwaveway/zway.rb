@@ -4,17 +4,15 @@ require 'net/http'
 require 'json'
 
 module RZWaveWay
-  class ZWay
+  module ZWay
+    extend self
     include Log4r
 
-    def self.init
+    def self.init hostname
       $log = Logger.new 'RZWaveWay'
       outputter = Outputter.stdout
       outputter.formatter = PatternFormatter.new(:pattern => "[%l] %d - %m")
       $log.outputters = Outputter.stdout
-    end
-
-    def initialize hostname
       @devices = {}
       @update_time = "0"
       @uri = URI::HTTP.build({:host => hostname, :port => 8083})
@@ -33,7 +31,7 @@ module RZWaveWay
         end
         @devices
       else
-        pp response.code
+        $log.error response.code
         return {}
       end
     end
@@ -44,11 +42,14 @@ module RZWaveWay
       updates_per_device = group_per_device updates
       updates_per_device.each do | id, updates |
         if @devices[id]
-          events.concat (@devices[id].process updates)
+          device_events = @devices[id].process updates
+          events += device_events unless device_events.empty?
         else
           $log.warn "Could not find device with id '#{id}'"
         end
       end
+      alive_events = check_not_alive_devices
+      events += alive_events unless alive_events.empty?
       events.each do |event|
         handler = @event_handlers[event.class]
         if handler
@@ -68,25 +69,34 @@ module RZWaveWay
         @update_time = results.delete("updateTime")
         return results
       else
-        pp response.code
+        $log.error response.code
         return {}
       end
     end
 
     def group_per_device updates
-      updates_per_device = Hash.new { [] }
+      updates_per_device = Hash.new({})
       updates.each do | key, value |
         match_data = key.match(/\Adevices\.(\d+)\./)
         if match_data
           device_id = match_data[1].to_i
           device_updates = updates_per_device[device_id]
-          device_updates << [match_data.post_match, value]
+          device_updates[match_data.post_match] = value
           updates_per_device[device_id] = device_updates
         else
           $log.warn "? #{key}"
         end
       end
       updates_per_device
+    end
+
+    def check_not_alive_devices
+      events = []
+      @devices.values.each do |device|
+        event = device.process_alive_check
+        events << event if event 
+      end
+      events
     end
 
     def http_post_request

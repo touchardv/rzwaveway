@@ -22,23 +22,8 @@ module RZWaveWay
 
     def build_json
       properties = {'deviceId' => @id}
-      if(support_commandclass? SENSOR_BINARY)
-        properties.merge!( {
-          'level' => @command_classes[SENSOR_BINARY].get_data('data.1.level.value'),
-          'lastLevelChangeTime' => @command_classes[SENSOR_BINARY].get_data('data.1.level.updateTime')          
-        })
-      end
-      if(support_commandclass? WAKEUP)
-        properties.merge!( {
-          'wakeUpInterval' => @command_classes[WAKEUP].get_data('data.interval.value'),
-          'lastSleepTime' => @command_classes[WAKEUP].get_data('data.lastSleep.value'),
-          'lastWakeUpTime' => @command_classes[WAKEUP].get_data('data.lastWakeup.value')
-        })
-      end
-      if(support_commandclass? BATTERY)
-        properties.merge!( {
-          'batteryLevel' => @command_classes[BATTERY].get_data('data.last.value')
-        })
+      @command_classes.each do |cc_id, cc|
+        properties.merge!(cc.properties)
       end
       properties.to_json
     end
@@ -52,7 +37,8 @@ module RZWaveWay
       updates_per_commandclass =  group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
         if @command_classes.has_key? cc
-          events << (@command_classes[cc].process(values, @id))
+          event = @command_classes[cc].process(values, @id)
+          events << event if event
         else
           $log.warn "Could not find command class: '#{cc}'"
         end
@@ -60,14 +46,22 @@ module RZWaveWay
       events
     end
 
+    def process_alive_check
+      if(support_commandclass? WAKEUP)
+        return @command_classes[WAKEUP].process_alive_check(@id)
+      end
+    end
+
+    private
+
     def group_per_commandclass updates
-      updates_per_commandclass = Hash.new { [] }
+      updates_per_commandclass = Hash.new({})
       updates.each do | key, value |
         match_data = key.match(/\Ainstances.0.commandClasses.(\d+)./)
         if match_data
           command_class = match_data[1].to_i
           cc_updates = updates_per_commandclass[command_class]
-          cc_updates << [match_data.post_match, value]
+          cc_updates[match_data.post_match] = value
           updates_per_commandclass[command_class] = cc_updates
         else
           $log.warn "? #{key}" unless key.match(/\Adata./)

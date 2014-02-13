@@ -9,6 +9,16 @@ module RZWaveWay
     end
   end
 
+  class NotAliveEvent
+    attr_reader :device_id
+    attr_reader :time_delay
+
+    def initialize device_id, time_delay
+      @device_id = device_id
+      @time_delay = time_delay
+    end
+  end
+
   class LevelEvent
     attr_reader :device_id
     attr_reader :time
