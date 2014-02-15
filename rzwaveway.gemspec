@@ -11,7 +11,8 @@ Gem::Specification.new do |s|
   s.has_rdoc = false
 
   dependencies = [
-    [:runtime,     "log4r",  "~> 1.1.10"]
+    [:runtime, "log4r", "~> 1.1.10"],
+    [:runtime, "httpclient", "~> 2.3.4.1"]
   ]
 
   dependencies.each do |type, name, version|

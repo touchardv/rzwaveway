@@ -1,12 +1,13 @@
-require 'uri'
+require 'httpclient'
 require 'log4r'
-require 'net/http'
 require 'json'
 
 module RZWaveWay
   module ZWay
     extend self
     include Log4r
+
+    BASE_PATH='/ZWaveAPI/Data/'
 
     def self.init hostname
       $log = Logger.new 'RZWaveWay'
@@ -15,30 +16,23 @@ module RZWaveWay
       $log.outputters = Outputter.stdout
       @devices = {}
       @update_time = "0"
-      @uri = URI::HTTP.build({:host => hostname, :port => 8083})
       @event_handlers = {}
+      @http_client = HTTPClient.new
+      @base_uri="http://#{hostname}:8083"
     end
 
     def get_devices
-      @uri.path = "/ZWaveAPI/Data/#{@update_time}"
-      response = http_post_request
-      if response.code == "200"
-        results = JSON.parse response.body
-        @update_time = results["updateTime"]
-        results["devices"].each do |device |
-          device_id = device[0].to_i
-          @devices[device_id] = ZWaveDevice.new(device_id, device[1]) if device_id > 1
-        end
-        @devices
-      else
-        $log.error response.code
-        return {}
+      results = http_post_request
+      results["devices"].each do |device_id,device_data_tree|
+        device_id = device_id.to_i
+        @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree) if device_id > 1
       end
+      @devices
     end
 
     def process_events
       events = []
-      updates = get_updates
+      updates = http_post_request
       updates_per_device = group_per_device updates
       updates_per_device.each do | id, updates |
         if @devices[id]
@@ -59,19 +53,6 @@ module RZWaveWay
         end
       end
       events
-    end
-
-    def get_updates
-      @uri.path = "/ZWaveAPI/Data/#{@update_time}"
-      response = http_post_request
-      if response.is_a?(Net::HTTPSuccess)
-        results = JSON.parse response.body
-        @update_time = results.delete("updateTime")
-        return results
-      else
-        $log.error response.code
-        return {}
-      end
     end
 
     def group_per_device updates
@@ -100,11 +81,16 @@ module RZWaveWay
     end
 
     def http_post_request
-      http = Net::HTTP.new(@uri.host, @uri.port)
-      http.use_ssl = false
-
-      request = Net::HTTP::Post.new(@uri.path)
-      http.request(request)
+      results = {}
+      url = @base_uri + BASE_PATH + "#{@update_time}"
+      response = @http_client.post(url)
+      if response.ok?
+        results = JSON.parse response.body
+        @update_time = results.delete("updateTime")
+      else
+        $log.error(response.reason)
+      end
+      results
     end
 
     def on_event (event, &listener)

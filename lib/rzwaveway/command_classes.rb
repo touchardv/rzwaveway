@@ -1,5 +1,3 @@
-require 'pp'
-
 module RZWaveWay
   module CommandClasses
     BASIC = 32
