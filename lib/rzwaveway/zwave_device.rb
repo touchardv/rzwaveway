@@ -55,14 +55,13 @@ module RZWaveWay
     private
 
     def group_per_commandclass updates
-      updates_per_commandclass = Hash.new({})
+      updates_per_commandclass = {}
       updates.each do | key, value |
         match_data = key.match(/\Ainstances.0.commandClasses.(\d+)./)
         if match_data
           command_class = match_data[1].to_i
-          cc_updates = updates_per_commandclass[command_class]
-          cc_updates[match_data.post_match] = value
-          updates_per_commandclass[command_class] = cc_updates
+          updates_per_commandclass[command_class] = {} unless updates_per_commandclass.has_key?(command_class)
+          updates_per_commandclass[command_class][match_data.post_match] = value
         else
           $log.warn "? #{key}" unless key.match(/\Adata./)
         end

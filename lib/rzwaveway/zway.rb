@@ -56,14 +56,13 @@ module RZWaveWay
     end
 
     def group_per_device updates
-      updates_per_device = Hash.new({})
+      updates_per_device = {}
       updates.each do | key, value |
         match_data = key.match(/\Adevices\.(\d+)\./)
         if match_data
           device_id = match_data[1].to_i
-          device_updates = updates_per_device[device_id]
-          device_updates[match_data.post_match] = value
-          updates_per_device[device_id] = device_updates
+          updates_per_device[device_id] = {} unless(updates_per_device.has_key?(device_id))
+          updates_per_device[device_id][match_data.post_match] = value
         else
           $log.warn "? #{key}"
         end
