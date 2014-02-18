@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name = "rzwaveway"
-  s.version = "0.0.3"
+  s.version = "0.0.4"
   s.authors = ["Vincent Touchard"]
-  s.date = %q{2014-02-08}
+  s.date = %q{2014-02-18}
   s.summary = 'ZWave API for ZWay'
   s.description = 'A Ruby API to use the Razberry ZWave ZWay interface'
   s.email = 'vincentoo.ignore@yahoo.com'
