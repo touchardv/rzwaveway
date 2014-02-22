@@ -19,6 +19,14 @@ module RZWaveWay
     end
   end
 
+  class DeadEvent
+    attr_reader :device_id
+
+    def initialize device_id
+      @device_id = device_id
+    end
+  end
+
   class LevelEvent
     attr_reader :device_id
     attr_reader :time

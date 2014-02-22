@@ -4,8 +4,12 @@ module RZWaveWay
     SENSOR_BINARY = 48
     MULTI_LEVEL_SENSOR = 49
     CONFIGURATION = 112
+    ALARM = 113
+    MANUFACTURER_SPECIFIC = 114
     BATTERY = 128
     WAKEUP = 132
+    ASSOCIATION = 133
+    VERSION = 134
     ALARM_SENSOR = 156
 
     DATA = {
@@ -29,8 +33,12 @@ module RZWaveWay
     attr_reader :id
     attr_reader :properties
 
+    RETRY_DELAYS_IN_MINUTES = [1, 5, 15, 30, 60, 120]
+
     def initialize(id, data)
       @id = id
+      @alive_check_failed_count = 0
+      @next_alive_check_time = 0
       @properties = {}
       if DATA.has_key? id 
         DATA[id].each do |key, name|
@@ -56,6 +64,8 @@ module RZWaveWay
       when WAKEUP
         if names.include?("data.lastWakeup") &&
           names.include?("data.lastSleep")
+          @alive_check_failed_count = 0
+          @next_alive_check_time = 0
           @properties['lastSleepTime'] = updates["data.lastSleep"]["value"]
           event = AliveEvent.new(device_id, @properties['lastSleepTime'])
         end
@@ -70,12 +80,27 @@ module RZWaveWay
     end
 
     def process_alive_check device_id
-      wakeup_interval = @properties['wakeUpInterval']
-      last_sleep_time = @properties['lastSleepTime']
       current_time = Time.now.to_i
-      estimated_wakeup_time = (last_sleep_time + wakeup_interval * 1.1).to_i
-      if(current_time > estimated_wakeup_time)
-        return NotAliveEvent.new(device_id, current_time - estimated_wakeup_time)
+      if(current_time >= @next_alive_check_time)
+        wakeup_interval = @properties['wakeUpInterval']
+        last_sleep_time = @properties['lastSleepTime']
+        unless(wakeup_interval && last_sleep_time)
+          return
+        end
+        estimated_wakeup_time = last_sleep_time + (wakeup_interval * 1.1)
+        if(current_time > estimated_wakeup_time)
+          retry_delay_in_minutes = RETRY_DELAYS_IN_MINUTES[@alive_check_failed_count]
+          if(retry_delay_in_minutes)
+            @next_alive_check_time = current_time + retry_delay_in_minutes * 60
+            @alive_check_failed_count += 1
+            return NotAliveEvent.new(device_id, current_time - estimated_wakeup_time)
+          else
+            return DeadEvent.new(device_id)
+          end
+        else
+          @next_alive_check_time = estimated_wakeup_time
+          nil
+        end
       end
     end
   end

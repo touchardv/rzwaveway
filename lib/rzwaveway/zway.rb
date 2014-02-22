@@ -23,9 +23,11 @@ module RZWaveWay
 
     def get_devices
       results = http_post_request
-      results["devices"].each do |device_id,device_data_tree|
-        device_id = device_id.to_i
-        @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree) if device_id > 1
+      if(results.has_key?("devices"))
+        results["devices"].each do |device_id,device_data_tree|
+          device_id = device_id.to_i
+          @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree) if device_id > 1
+        end
       end
       @devices
     end
@@ -82,12 +84,16 @@ module RZWaveWay
     def http_post_request
       results = {}
       url = @base_uri + BASE_PATH + "#{@update_time}"
-      response = @http_client.post(url)
-      if response.ok?
-        results = JSON.parse response.body
-        @update_time = results.delete("updateTime")
-      else
-        $log.error(response.reason)
+      begin
+        response = @http_client.post(url)
+        if response.ok?
+          results = JSON.parse response.body
+          @update_time = results.delete("updateTime")
+        else
+          $log.error(response.reason)
+        end
+      rescue StandardError => e
+        $log.error("Failed to communicate with ZWay HTTP server: #{e}")
       end
       results
     end
