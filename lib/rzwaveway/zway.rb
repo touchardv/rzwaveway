@@ -11,9 +11,14 @@ module RZWaveWay
 
     def self.init hostname
       $log = Logger.new 'RZWaveWay'
+      formatter = PatternFormatter.new(:pattern => "[%l] %d - %m")
       outputter = Outputter.stdout
-      outputter.formatter = PatternFormatter.new(:pattern => "[%l] %d - %m")
-      $log.outputters = Outputter.stdout
+      outputter.formatter = formatter
+      outputter.level = Log4r::INFO
+      file_outputter = RollingFileOutputter.new('file', filename: 'rzwaveway.log', maxsize: 1048576, trunc: 86400)
+      file_outputter.formatter = formatter
+      file_outputter.level = Log4r::DEBUG
+      $log.outputters = [Outputter.stdout, file_outputter]
       @devices = {}
       @update_time = "0"
       @event_handlers = {}
@@ -51,7 +56,7 @@ module RZWaveWay
         if handler
           handler.call(event)
         else
-          $log.warn "no handler for #{event.class}"
+          $log.warn "No event handler for #{event.class}"
         end
       end
       events
@@ -66,7 +71,7 @@ module RZWaveWay
           updates_per_device[device_id] = {} unless(updates_per_device.has_key?(device_id))
           updates_per_device[device_id][match_data.post_match] = value
         else
-          $log.warn "? #{key}"
+          $log.debug "No device group match for key='#{key}'"
         end
       end
       updates_per_device

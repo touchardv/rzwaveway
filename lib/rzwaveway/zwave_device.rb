@@ -63,7 +63,7 @@ module RZWaveWay
           updates_per_commandclass[command_class] = {} unless updates_per_commandclass.has_key?(command_class)
           updates_per_commandclass[command_class][match_data.post_match] = value
         else
-          $log.warn "? #{key}" unless key.match(/\Adata./)
+          $log.debug "? #{key}" unless key.match(/\Adata./)
         end
       end
       updates_per_commandclass
