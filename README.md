@@ -7,7 +7,7 @@ A Ruby library for communicating with the ZWave protocol stack from ZWay, runnin
 ```
 require 'rzwaveway'
 
-z_way = RZWaveWay::ZWay.new('192.168.1.123)
+z_way = RZWaveWay::ZWay.new('192.168.1.123')
 devices = z_way.get_devices
 devices.values.each do | device |
   puts device.build_json
