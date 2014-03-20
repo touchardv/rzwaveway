@@ -33,7 +33,7 @@ module RZWaveWay
     attr_reader :id
     attr_reader :properties
 
-    RETRY_DELAYS_IN_MINUTES = [1, 5, 15, 30, 60, 120]
+    ALIVE_CHECK_RETRY_DELAYS_IN_MINUTES = [1, 5, 15, 30, 60, 120]
 
     def initialize(id, data)
       @id = id
@@ -62,10 +62,11 @@ module RZWaveWay
       names = updates.keys
       case id
       when WAKEUP
-        if names.include?("data.lastWakeup") &&
-          names.include?("data.lastSleep")
+        if names.include?("data.lastWakeup") && @properties['lastWakeUpTime'] < updates["data.lastWakeup"]["value"] &&
+          names.include?("data.lastSleep") && @properties['lastSleepTime'] < updates["data.lastSleep"]["value"]
           @alive_check_failed_count = 0
           @next_alive_check_time = 0
+          @properties['lastWakeUpTime'] = updates["data.lastWakeup"]["value"]
           @properties['lastSleepTime'] = updates["data.lastSleep"]["value"]
           event = AliveEvent.new(device_id, @properties['lastSleepTime'])
         end
@@ -89,7 +90,7 @@ module RZWaveWay
         end
         estimated_wakeup_time = last_sleep_time + (wakeup_interval * 1.1)
         if(current_time > estimated_wakeup_time)
-          retry_delay_in_minutes = RETRY_DELAYS_IN_MINUTES[@alive_check_failed_count]
+          retry_delay_in_minutes = ALIVE_CHECK_RETRY_DELAYS_IN_MINUTES[@alive_check_failed_count]
           if(retry_delay_in_minutes)
             @next_alive_check_time = current_time + retry_delay_in_minutes * 60
             @alive_check_failed_count += 1
