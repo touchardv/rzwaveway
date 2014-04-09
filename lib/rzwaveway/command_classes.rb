@@ -41,7 +41,7 @@ module RZWaveWay
       @wakeup_missed_count = 0
       @next_wakeup_check_time = 0
       @properties = {}
-      if DATA.has_key? id 
+      if DATA.has_key? id
         DATA[id].each do |key, name|
           @properties[key] = get_data(name, data)
         end
@@ -63,15 +63,14 @@ module RZWaveWay
       names = updates.keys
       case id
       when WAKEUP
-        if names.include?("data.lastWakeup") && @properties['lastWakeUpTime'] < updates["data.lastWakeup"]["value"] &&
-          names.include?("data.lastSleep") && @properties['lastSleepTime'] < updates["data.lastSleep"]["value"]
+        if names.include?("data.lastWakeup") && @properties['lastWakeUpTime'] < updates["data.lastWakeup"]["value"]
           @dead = false
           @wakeup_missed_count = 0
           @next_wakeup_check_time = 0
           @properties['lastWakeUpTime'] = updates["data.lastWakeup"]["value"]
-          @properties['lastSleepTime'] = updates["data.lastSleep"]["value"]
-          event = AliveEvent.new(device_id, @properties['lastSleepTime'])
+          event = AliveEvent.new(device_id, @properties['lastWakeUpTime'])
         end
+        @properties['lastSleepTime'] = updates["data.lastSleep"]["value"] if names.include? 'data.lastSleep'
       when SENSOR_BINARY
         if names.include?("data.1")
           @properties['lastLevelChangeTime'] = updates['data.1']["level"]["updateTime"]
