@@ -13,7 +13,7 @@ module RZWaveWay
     attr_reader :device_id
     attr_reader :time_delay
 
-    def initialize device_id, time_delay
+    def initialize(device_id, time_delay)
       @device_id = device_id
       @time_delay = time_delay
     end
@@ -22,7 +22,7 @@ module RZWaveWay
   class DeadEvent
     attr_reader :device_id
 
-    def initialize device_id
+    def initialize(device_id)
       @device_id = device_id
     end
   end
@@ -32,7 +32,7 @@ module RZWaveWay
     attr_reader :time
     attr_reader :level
 
-    def initialize device_id, time, level
+    def initialize(device_id, time, level)
       @device_id = device_id
       @time = time
       @level = level

@@ -12,7 +12,7 @@ module RZWaveWay
       $log.info "Created ZWaveDevice with id='#{id}'"
     end
 
-    def create_commandclasses_from data
+    def create_commandclasses_from(data)
       cc_classes = {}
       data['instances']['0']['commandClasses'].each do |cc_id, sub_tree|
         cc_classes[cc_id.to_i] = CommandClass.new(cc_id.to_i, sub_tree)
@@ -28,11 +28,11 @@ module RZWaveWay
       properties.to_json
     end
 
-    def support_commandclass? command_class
+    def support_commandclass?(command_class)
       @command_classes.has_key? command_class
     end
 
-    def process updates
+    def process(updates)
       events = []
       updates_per_commandclass =  group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
@@ -54,7 +54,7 @@ module RZWaveWay
 
     private
 
-    def group_per_commandclass updates
+    def group_per_commandclass(updates)
       updates_per_commandclass = {}
       updates.each do | key, value |
         match_data = key.match(/\Ainstances.0.commandClasses.(\d+)./)

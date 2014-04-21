@@ -1,8 +1,9 @@
 module RZWaveWay
   module CommandClasses
     BASIC = 32
+    SWITCH_MULTI_LEVEL = 38
     SENSOR_BINARY = 48
-    MULTI_LEVEL_SENSOR = 49
+    SENSOR_MULTI_LEVEL = 49
     CONFIGURATION = 112
     ALARM = 113
     MANUFACTURER_SPECIFIC = 114
@@ -48,17 +49,7 @@ module RZWaveWay
       end
     end
 
-    def get_data name, data
-      parts = name.split '.'
-      result = data
-      parts.each do | part |
-        raise "Could not find part '#{part}' in '#{name}'" unless result.has_key? part
-        result = result[part]
-      end
-      result
-    end
-
-    def process updates, device_id
+    def process(updates, device_id)
       event = nil
       names = updates.keys
       case id
@@ -81,7 +72,7 @@ module RZWaveWay
       event
     end
 
-    def process_alive_check device_id
+    def process_alive_check(device_id)
       return nil if @dead
       current_time = Time.now.to_i
       if(current_time >= @next_wakeup_check_time)
@@ -105,6 +96,18 @@ module RZWaveWay
           nil
         end
       end
+    end
+
+    private
+
+    def get_data(name, data)
+      parts = name.split '.'
+      result = data
+      parts.each do | part |
+        raise "Could not find part '#{part}' in '#{name}'" unless result.has_key? part
+        result = result[part]
+      end
+      result
     end
   end
 end
