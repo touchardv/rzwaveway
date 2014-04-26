@@ -11,8 +11,6 @@ module RZWaveWay
 
     attr_reader :devices
 
-    BASE_PATH='/ZWaveAPI/Data/'
-
     def initialize
       $log = Logger.new 'RZWaveWay'
       formatter = PatternFormatter.new(:pattern => "[%l] %d - %m")
@@ -29,12 +27,7 @@ module RZWaveWay
       raise "No device with id '#{device_id}'" unless @devices.has_key?(device_id)
       raise "Device with id '#{device_id}' does not support command class '#{command_class}'" unless @devices[device_id].support_commandclass?(command_class)
       function_name = command_class_function.to_s
-      if argument
-        uri = @base_uri + "/ZWaveAPI/Run/devices[#{device_id}].instances[0].commandClasses[#{command_class}].#{function_name}(#{argument})"
-      else
-        uri = @base_uri + "/ZWaveAPI/Run/devices[#{device_id}].instances[0].commandClasses[#{command_class}].#{function_name}()"
-      end
-      puts uri
+      run_zway_function(device_id, command_class, function_name, argument)
     end
 
     def setup(hostname)
@@ -46,7 +39,7 @@ module RZWaveWay
       @devices = {}
       @event_handlers = {}
       @update_time = '0'
-      results = http_get_request
+      results = get_zway_data_tree_updates
       if(results.has_key?('devices'))
         results['devices'].each do |device_id,device_data_tree|
           device_id = device_id.to_i
@@ -61,7 +54,7 @@ module RZWaveWay
 
     def process_events
       events = []
-      updates = http_get_request
+      updates = get_zway_data_tree_updates
       updates_per_device = group_per_device updates
       updates_per_device.each do | id, updates |
         if @devices[id]
@@ -86,6 +79,9 @@ module RZWaveWay
 
     private
 
+    DATA_TREE_BASE_PATH='/ZWaveAPI/Data/'
+    RUN_BASE_PATH='/ZWaveAPI/Run/'
+
     def check_not_alive_devices
       @devices.values.each_with_object([]) do |device, events|
         event = device.process_alive_check
@@ -108,9 +104,9 @@ module RZWaveWay
       updates_per_device
     end
 
-    def http_get_request
+    def get_zway_data_tree_updates
       results = {}
-      url = @base_uri + BASE_PATH + "#{@update_time}"
+      url = @base_uri + DATA_TREE_BASE_PATH + "#{@update_time}"
       begin
         response = @http_client.get(url)
         if response.ok?
@@ -123,6 +119,25 @@ module RZWaveWay
         $log.error("Failed to communicate with ZWay HTTP server: #{e}")
       end
       results
+    end
+
+    def run_zway_function(device_id, command_class, function_name, argument)
+      command_path = "devices[#{device_id}].instances[0].commandClasses[#{command_class}]."
+      if argument
+        command_path += "#{function_name}(#{argument})"
+      else
+        command_path += "#{function_name}()"
+      end
+      begin
+        uri = URI.encode(@base_uri + RUN_BASE_PATH + command_path, '[]')
+        response = @http_client.get(uri)
+        unless response.ok?
+          $log.error(response.reason)
+          $log.error(e.backtrace)
+        end
+      rescue StandardError => e
+        $log.error("Failed to communicate with ZWay HTTP server: #{e}")
+      end
     end
   end
 end
