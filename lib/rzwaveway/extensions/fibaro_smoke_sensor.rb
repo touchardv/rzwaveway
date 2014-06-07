@@ -8,7 +8,7 @@ module RZWaveWay
       end
 
       def refresh_temperature
-        RZWaveWay::ZWay.instance.execute(@device_id, :sensor_multi_value_get)
+        RZWaveWay::ZWay.instance.execute(@device_id, SENSOR_MULTI_LEVEL, :Get)
       end
     end
   end
