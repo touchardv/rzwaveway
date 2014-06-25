@@ -43,7 +43,7 @@ module RZWaveWay
       if(results.has_key?('devices'))
         results['devices'].each do |device_id,device_data_tree|
           device_id = device_id.to_i
-          @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree) if device_id > 1
+          @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree)
         end
       end
     end
