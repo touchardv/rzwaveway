@@ -5,31 +5,47 @@ module RZWaveWay
     include CommandClasses
 
     attr_reader :id
+    attr_reader :last_contact_time
+    attr_accessor :contact_frequency
+    attr_reader :properties
 
     def initialize(id, data)
+      @dead = false
       @id = id
+      @last_contact_time = 0
+      @missed_contact_count = 0
+      @contact_frequency = 0
+      @properties = {}
       @command_classes = create_commandclasses_from data
       $log.info "Created ZWaveDevice with id='#{id}'"
     end
 
     def create_commandclasses_from(data)
       cc_classes = {}
-      data['instances']['0']['commandClasses'].each do |cc_id, sub_tree|
-        cc_classes[cc_id.to_i] = CommandClass.new(cc_id.to_i, sub_tree)
+      data['instances']['0']['commandClasses'].each do |id, sub_tree|
+        cc_id = id.to_i
+        cc_classes[cc_id] = CommandClasses::Factory.instance.instantiate(cc_id, sub_tree, self)
       end
       cc_classes
     end
 
-    def build_json
-      properties = {'deviceId' => @id}
-      @command_classes.each do |cc_id, cc|
-        properties.merge!(cc.properties)
-      end
-      properties.to_json
+    def to_json
+      attributes = {
+        'deviceId' => @id,
+        # TODO remove these obsolete attributes (kept for backward compatibility)
+        'lastSleepTime' => @last_contact_time,
+        'lastWakeUpTime' => @last_contact_time,
+        'wakeUpInterval' => @contact_frequency
+        # ---
+        # 'lastContactTime' => @last_contact_time,
+        # 'contactFrequency' => @contact_frequency,
+        # 'properties' => @properties.to_json
+      }
+      attributes.to_json
     end
 
-    def support_commandclass?(command_class)
-      @command_classes.has_key? command_class
+    def support_commandclass?(command_class_id)
+      @command_classes.has_key? command_class_id
     end
 
     def process(updates)
@@ -37,7 +53,7 @@ module RZWaveWay
       updates_per_commandclass =  group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
         if @command_classes.has_key? cc
-          event = @command_classes[cc].process(values, @id)
+          event = @command_classes[cc].process(values, self)
           events << event if event
         else
           $log.warn "Could not find command class: '#{cc}'"
@@ -47,12 +63,34 @@ module RZWaveWay
     end
 
     def process_alive_check
-      if(support_commandclass? WAKEUP)
-        return @command_classes[WAKEUP].process_alive_check(@id)
+      return if @dead
+      if @contact_frequency > 0
+        current_time = Time.now.to_i
+        next_contact_time = @last_contact_time + (@contact_frequency * (1 + @missed_contact_count) * 1.1)
+        if current_time > next_contact_time
+          count = ((current_time - @last_contact_time) / @contact_frequency).to_i
+          if count > MAXIMUM_MISSED_CONTACT
+            @dead = true
+            DeadEvent.new(@id)
+          elsif count > @missed_contact_count
+            @missed_contact_count = count
+            NotAliveEvent.new(@id, 0)
+          end
+        end
+      end
+    end
+
+    def notify_contacted(time)
+      if time.to_i > @last_contact_time
+        @dead = false
+        @last_contact_time = time.to_i
+        @missed_contact_count = 0
       end
     end
 
     private
+
+    MAXIMUM_MISSED_CONTACT = 10
 
     def group_per_commandclass(updates)
       updates_per_commandclass = {}
