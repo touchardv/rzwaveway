@@ -1,6 +1,7 @@
 require 'singleton'
 
 require_relative 'command_class'
+require_relative 'command_classes/battery'
 require_relative 'command_classes/sensor_binary'
 require_relative 'command_classes/wake_up'
 

@@ -1,0 +1,17 @@
+{
+  "devices.4.instances.0.commandClasses.128.data.history.60": {
+    "name": "60",
+    "value": 1409681662,
+    "type": "int",
+    "invalidateTime": 1409681542,
+    "updateTime": 1409681662
+  },
+  "devices.4.instances.0.commandClasses.128.data.last": {
+    "name": "last",
+    "value": 60,
+    "type": "int",
+    "invalidateTime": 1409681542,
+    "updateTime": 1409681662
+  },
+  "updateTime": 1409681666
+}

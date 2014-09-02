@@ -33,6 +33,7 @@ module RZWaveWay
           }}}
           event = command_class.process(updates, device)
           expect(event.class).to be RZWaveWay::LevelEvent
+          expect(event.level).to eq true
           expect(event.device_id).to eq device.id
           expect(event.time).to eq 1405102860
         end

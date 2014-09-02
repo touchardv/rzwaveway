@@ -49,7 +49,7 @@ module RZWaveWay
     end
 
     def process(updates)
-      events = []
+      events = process_data(updates)
       updates_per_commandclass =  group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
         if @command_classes.has_key? cc
@@ -105,6 +105,17 @@ module RZWaveWay
         end
       end
       updates_per_commandclass
+    end
+
+    def process_data(updates)
+      events = []
+      updates.each do | key, value |
+        if key == 'data.lastReceived' || key == 'data.lastSend'
+          time = value['updateTime']
+          notify_contacted(time)
+        end
+      end
+      events
     end
   end
 end

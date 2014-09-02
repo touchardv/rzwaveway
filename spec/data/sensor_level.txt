@@ -1,0 +1,24 @@
+{
+  "devices.10.instances.0.commandClasses.48.data.1": {
+    "name": "1",
+    "value": null,
+    "type": "NoneType",
+    "sensorTypeString": {
+      "name": "sensorTypeString",
+      "value": "General purpose",
+      "type": "str",
+      "invalidateTime": 1400840129,
+      "updateTime": 1400840130
+    },
+    "level": {
+      "name": "level",
+      "value": false,
+      "type": "bool",
+      "invalidateTime": 1400840129,
+      "updateTime": 1409508623
+    },
+    "invalidateTime": 1400840129,
+    "updateTime": 1409508623
+  },
+  "updateTime": 1409508626
+}

@@ -25,6 +25,58 @@ module RZWaveWay
       end
     end
 
+    describe '#process' do
+      it 'updates the last contact time (from lastReceived)' do
+        updates = {
+          'data.lastReceived' => {
+            'name' => 'lastReceived',
+            'value' => 176428709,
+            'type' => 'int',
+            'invalidateTime' => 1390251561,
+            'updateTime' => 1409490977
+
+          }
+        }
+        device.process(updates)
+        expect(device.last_contact_time).to eq 1409490977
+      end
+
+      it 'updates the last contact time (from lastSend)' do
+        updates = {
+          'data.lastSend' => {
+            'name' => 'lastSend',
+            'value' => 176428709,
+            'type' => 'int',
+            'invalidateTime' => 1390251561,
+            'updateTime' => 1409490970
+          }
+        }
+        device.process(updates)
+        expect(device.last_contact_time).to eq 1409490970
+      end
+
+      it 'updates the last contact time' do
+        updates = {
+          'data.lastReceived' => {
+            'name' => 'lastReceived',
+            'value' => 176428709,
+            'type' => 'int',
+            'invalidateTime' => 1390251561,
+            'updateTime' => 1409490977
+          },
+          'data.lastSend' => {
+            'name' => 'lastSend',
+            'value' => 176428709,
+            'type' => 'int',
+            'invalidateTime' => 1390251561,
+            'updateTime' => 1409490970
+          }
+        }
+        device.process(updates)
+        expect(device.last_contact_time).to eq 1409490977
+      end
+    end
+
     describe '#process_alive_check' do
       context 'device is not supporting wake up command class' do
       end

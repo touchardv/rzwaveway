@@ -39,6 +39,18 @@ module RZWaveWay
     end
   end
 
+  class BatteryValueEvent
+    attr_reader :device_id
+    attr_reader :time
+    attr_reader :value
+
+    def initialize(device_id, time, value)
+      @device_id = device_id
+      @time = time
+      @value = value
+    end
+  end
+
   class SmokeEvent
     attr_reader :device_id
     attr_reader :time

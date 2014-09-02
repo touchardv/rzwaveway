@@ -1,0 +1,45 @@
+{
+  "devices.4.data.isAwake": {
+    "name": "isAwake",
+    "value": false,
+    "type": "bool",
+    "invalidateTime": 1371901717,
+    "updateTime": 1409500515
+  },
+  "devices.4.data.lastSend": {
+    "name": "lastSend",
+    "value": 177270192,
+    "type": "int",
+    "invalidateTime": 1407492414,
+    "updateTime": 1409500515
+  },
+  "devices.4.data.lastNonceGet": {
+    "name": "lastNonceGet",
+    "value": 177269183,
+    "type": "int",
+    "invalidateTime": 1407492414,
+    "updateTime": 1409500514
+  },
+  "devices.4.data.lastReceived": {
+    "name": "lastReceived",
+    "value": 0,
+    "type": "int",
+    "invalidateTime": 1371901717,
+    "updateTime": 1409500514
+  },
+  "devices.4.instances.0.commandClasses.132.data.lastWakeup": {
+    "name": "lastWakeup",
+    "value": 1409500514,
+    "type": "int",
+    "invalidateTime": 1402383689,
+    "updateTime": 1409500514
+  },
+  "devices.4.instances.0.commandClasses.132.data.lastSleep": {
+    "name": "lastSleep",
+    "value": 1409500514,
+    "type": "int",
+    "invalidateTime": 1402383689,
+    "updateTime": 1409500514
+  },
+  "updateTime": 1409500520
+}
