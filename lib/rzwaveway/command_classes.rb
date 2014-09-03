@@ -33,7 +33,8 @@ module RZWaveWay
 
       CLASSES = {
         SENSOR_BINARY => CommandClasses::SensorBinary,
-        WAKEUP => CommandClasses::WakeUp
+        WAKEUP => CommandClasses::WakeUp,
+        BATTERY => CommandClasses::Battery
       }
     end
   end

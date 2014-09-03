@@ -1,17 +1,73 @@
 {
-  "devices.4.instances.0.commandClasses.128.data.history.60": {
-    "name": "60",
-    "value": 1409681662,
-    "type": "int",
-    "invalidateTime": 1409681542,
-    "updateTime": 1409681662
+  "devices.11.instances.0.commandClasses.128.data": {
+    "name": "devices.11.instances.0.commandClasses.128.data",
+    "value": null,
+    "type": "NoneType",
+    "supported": {
+      "name": "supported",
+      "value": true,
+      "type": "bool",
+      "invalidateTime": 1409683007,
+      "updateTime": 1403337655
+    },
+    "version": {
+      "name": "version",
+      "value": 1,
+      "type": "int",
+      "invalidateTime": 1409683007,
+      "updateTime": 1403337810
+    },
+    "security": {
+      "name": "security",
+      "value": false,
+      "type": "bool",
+      "invalidateTime": 1403337654,
+      "updateTime": 1403337655
+    },
+    "interviewDone": {
+      "name": "interviewDone",
+      "value": true,
+      "type": "bool",
+      "invalidateTime": 1403337654,
+      "updateTime": 1403337815
+    },
+    "interviewCounter": {
+      "name": "interviewCounter",
+      "value": 9,
+      "type": "int",
+      "invalidateTime": 1403337654,
+      "updateTime": 1403337814
+    },
+    "lastChange": {
+      "name": "lastChange",
+      "value": 1403338820,
+      "type": "int",
+      "invalidateTime": 1409683007,
+      "updateTime": 1403338820
+    },
+    "history": {
+      "name": "history",
+      "value": null,
+      "type": "NoneType",
+      "96": {
+        "name": "96",
+        "value": 1403338820,
+        "type": "int",
+        "invalidateTime": 1409683007,
+        "updateTime": 1403338820
+      },
+      "invalidateTime": 1409683007,
+      "updateTime": 1403338820
+    },
+    "last": {
+      "name": "last",
+      "value": 96,
+      "type": "int",
+      "invalidateTime": 1409683007,
+      "updateTime": 1403338820
+    },
+    "invalidateTime": 1409683007,
+    "updateTime": 1403337655
   },
-  "devices.4.instances.0.commandClasses.128.data.last": {
-    "name": "last",
-    "value": 60,
-    "type": "int",
-    "invalidateTime": 1409681542,
-    "updateTime": 1409681662
-  },
-  "updateTime": 1409681666
+  "updateTime": 1409683018
 }
