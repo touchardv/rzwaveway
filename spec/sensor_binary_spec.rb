@@ -15,8 +15,7 @@ module RZWaveWay
       describe '#new' do
         it 'stores interesting properties' do
           command_class
-          expect(device.properties[:level]).to be false
-          expect(device.properties[:last_level_update_time]).to eq 1405102560
+          expect(device.get_property(:level)).to eq [false, 1405102560]
         end
       end
 

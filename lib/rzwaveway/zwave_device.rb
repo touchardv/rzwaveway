@@ -7,7 +7,6 @@ module RZWaveWay
     attr_reader :id
     attr_reader :last_contact_time
     attr_accessor :contact_frequency
-    attr_reader :properties
 
     def initialize(id, data)
       @dead = false
@@ -86,6 +85,26 @@ module RZWaveWay
         @last_contact_time = time.to_i
         @missed_contact_count = 0
       end
+    end
+
+    def add_property(name, value, updateTime)
+      @properties[name] = [value, updateTime]
+    end
+
+    def get_property(name)
+      @properties[name].dup
+    end
+
+    def update_property(name, value, updateTime)
+      if @properties.has_key?(name)
+        property = @properties[name]
+        if property[0] != value || property[1] < updateTime
+          property[0] = value
+          property[1] = updateTime
+          return true
+        end
+      end
+      return false
     end
 
     private
