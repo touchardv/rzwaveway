@@ -4,19 +4,35 @@ module RZWaveWay
       include CommandClass
 
       def initialize(data, device)
-        wakeUpInterval = find('data.interval.value', data)
-        lastSleepTime = find('data.lastSleep.value', data)
-        lastWakeUpTime = find('data.lastWakeup.value', data)
-        device.contact_frequency = wakeUpInterval
-        device.notify_contacted(lastWakeUpTime)
+        wakeup_interval = find('data.interval.value', data)
+        last_wakeup_time = find('data.lastWakeup.value', data)
+        last_sleep_time = find('data.lastSleep.value', data)
+
+        device.add_property(:wakeup_interval,
+                            wakeup_interval,
+                            find('data.interval.updateTime', data))
+        device.add_property(:wakeup_last_sleep_time,
+                            last_sleep_time,
+                            find('data.lastSleep.updateTime', data))
+        device.add_property(:wakeup_last_wakeup_time,
+                            last_wakeup_time,
+                            find('data.lastSleep.updateTime', data))
+
+        device.contact_frequency = wakeup_interval
+        device.notify_contacted(last_wakeup_time)
       end
 
       def process(updates, device)
         if updates.keys.include?('data.lastWakeup')
-          last_wakeup_time = updates['data.lastWakeup']['value']
-          device.notify_contacted(last_wakeup_time)
-          return AliveEvent.new(device.id, last_wakeup_time)
+          data = updates['data.lastWakeup']
+          value = data['value']
+          updateTime = data['updateTime']
+          if device.update_property(:wakeup_last_wakeup_time, value, updateTime)
+            return AliveEvent.new(device.id, value)
+          end
         end
+
+        # TODO handle change of wake up interval value?
       end
     end
   end

@@ -84,6 +84,7 @@ module RZWaveWay
         @dead = false
         @last_contact_time = time.to_i
         @missed_contact_count = 0
+        true
       end
     end
 
@@ -101,10 +102,9 @@ module RZWaveWay
         if property[0] != value || property[1] < updateTime
           property[0] = value
           property[1] = updateTime
-          return true
+          true
         end
       end
-      return false
     end
 
     private
