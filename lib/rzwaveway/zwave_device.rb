@@ -48,8 +48,8 @@ module RZWaveWay
     end
 
     def process(updates)
-      events = process_data(updates)
-      updates_per_commandclass =  group_per_commandclass updates
+      events = []
+      updates_per_commandclass = group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
         if @command_classes.has_key? cc
           event = @command_classes[cc].process(values, self)
@@ -58,6 +58,7 @@ module RZWaveWay
           $log.warn "Could not find command class: '#{cc}'"
         end
       end
+      process_device_data(updates, events)
       events
     end
 
@@ -112,6 +113,7 @@ module RZWaveWay
     MAXIMUM_MISSED_CONTACT = 10
 
     def group_per_commandclass(updates)
+      other_updates = {}
       updates_per_commandclass = {}
       updates.each do | key, value |
         match_data = key.match(/\Ainstances.0.commandClasses.(\d+)./)
@@ -120,21 +122,23 @@ module RZWaveWay
           updates_per_commandclass[command_class] = {} unless updates_per_commandclass.has_key?(command_class)
           updates_per_commandclass[command_class][match_data.post_match] = value
         else
-          $log.debug "? #{key}" unless key.match(/\Adata./)
+          other_updates[key] = value
         end
       end
+      updates.clear
+      updates.merge!(other_updates)
       updates_per_commandclass
     end
 
-    def process_data(updates)
-      events = []
+    def process_device_data(updates, events)
+      times = []
       updates.each do | key, value |
         if key == 'data.lastReceived' || key == 'data.lastSend'
-          time = value['updateTime']
-          notify_contacted(time)
+          times << value['updateTime']
         end
       end
-      events
+      time = times.max
+      events << AliveEvent.new(@id, time) if notify_contacted(time)
     end
   end
 end
