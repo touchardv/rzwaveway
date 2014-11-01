@@ -53,8 +53,37 @@ module RZWaveWay
     end
 
     def process_events
-      events = []
       updates = get_zway_data_tree_updates
+      events = devices_process updates
+      check_not_alive_devices(events)
+      deliver_to_handlers(events)
+    end
+
+    private
+
+    DATA_TREE_BASE_PATH='/ZWaveAPI/Data/'
+    RUN_BASE_PATH='/ZWaveAPI/Run/'
+
+    def check_not_alive_devices(events)
+      @devices.values.each do |device|
+        event = device.process_alive_check
+        events << event if event
+      end
+    end
+
+    def deliver_to_handlers events
+      events.each do |event|
+        handler = @event_handlers[event.class]
+        if handler
+          handler.call(event)
+        else
+          $log.warn "No event handler for #{event.class}"
+        end
+      end
+    end
+
+    def devices_process updates
+      events = []
       updates_per_device = group_per_device updates
       updates_per_device.each do | id, updates |
         if @devices[id]
@@ -64,29 +93,7 @@ module RZWaveWay
           $log.warn "Could not find device with id '#{id}'"
         end
       end
-      alive_events = check_not_alive_devices
-      events += alive_events unless alive_events.empty?
-      events.each do |event|
-        handler = @event_handlers[event.class]
-        if handler
-          handler.call(event)
-        else
-          $log.warn "No event handler for #{event.class}"
-        end
-      end
       events
-    end
-
-    private
-
-    DATA_TREE_BASE_PATH='/ZWaveAPI/Data/'
-    RUN_BASE_PATH='/ZWaveAPI/Run/'
-
-    def check_not_alive_devices
-      @devices.values.each_with_object([]) do |device, events|
-        event = device.process_alive_check
-        events << event if event
-      end
     end
 
     def group_per_device updates

@@ -4,9 +4,26 @@ module RZWaveWay
   describe ZWaveDevice do
     let(:now) { Time.now }
     let(:device) do
-      device = ZWaveDevice.new(create_id, create_device_data)
-      device.contact_frequency = 300
-      device
+      ZWaveDevice.new(create_id, create_device_data({CommandClass::WAKEUP =>
+                                                     {
+                                                       'data' => {
+                                                         'interval' => { 'value' => 300, 'updateTime' => 0 },
+                                                         'lastSleep' => { 'value' => 0, 'updateTime' => 0 },
+                                                         'lastWakeup' => { 'value' => 0, 'updateTime' => 0 }
+                                                       }
+                                                     }
+                                                     }))
+    end
+
+    describe '#contacts_controller_periodically?' do
+      it 'returns true if device supports wake up cc' do
+        expect(device.contacts_controller_periodically?).to be true
+      end
+
+      it 'returns false if device does not support wake up cc' do
+        ac_powered_device = ZWaveDevice.new(create_id, create_device_data)
+        expect(ac_powered_device.contacts_controller_periodically?).to be false
+      end
     end
 
     describe '#notify_contacted' do
@@ -126,50 +143,45 @@ module RZWaveWay
     end
 
     describe '#process_alive_check' do
-      context 'device is not supporting wake up command class' do
+      it 'generates no event' do
+        device.notify_contacted(now)
+        event = device.process_alive_check
+        expect(event).to be_nil
       end
 
-      context 'device is supporting wake up command class' do
-        it 'generates no event' do
-          device.notify_contacted(now)
-          event = device.process_alive_check
-          expect(event).to be_nil
-        end
-
-        it 'generates a NotAliveEvent' do
-          device.notify_contacted(now - 600)
-          event = device.process_alive_check
-          expect(event.class).to be NotAliveEvent
-          expect(event.device_id).to eq device.id
-        end
-
-        it 'does not generate a NotAliveEvent at each check' do
-          device.notify_contacted(now - 600)
-          event = device.process_alive_check
-          event = device.process_alive_check
-          expect(event).to be_nil
-        end
-
-        it 'generates a DeadEvent' do
-          device.notify_contacted(now - 6000)
-          event = device.process_alive_check
-          expect(event.class).to be DeadEvent
-          expect(event.device_id).to eq device.id
-        end
-
-        it 'does not generate a DeadEvent multiple times' do
-          device.notify_contacted(now - 6000)
-          event = device.process_alive_check
-          event = device.process_alive_check
-          expect(event).to be_nil
-        end
+      it 'generates a NotAliveEvent' do
+        device.notify_contacted(now - 600)
+        event = device.process_alive_check
+        expect(event.class).to be NotAliveEvent
+        expect(event.device_id).to eq device.id
       end
 
-      describe '#to_json' do
-        it 'returns json' do
-          json = device.to_json
-          expect(json.size).not_to eq 0
-        end
+      it 'does not generate a NotAliveEvent at each check' do
+        device.notify_contacted(now - 600)
+        event = device.process_alive_check
+        event = device.process_alive_check
+        expect(event).to be_nil
+      end
+
+      it 'generates a DeadEvent' do
+        device.notify_contacted(now - 6000)
+        event = device.process_alive_check
+        expect(event.class).to be DeadEvent
+        expect(event.device_id).to eq device.id
+      end
+
+      it 'does not generate a DeadEvent multiple times' do
+        device.notify_contacted(now - 6000)
+        event = device.process_alive_check
+        event = device.process_alive_check
+        expect(event).to be_nil
+      end
+    end
+
+    describe '#to_json' do
+      it 'returns json' do
+        json = device.to_json
+        expect(json.size).not_to eq 0
       end
     end
   end

@@ -28,6 +28,10 @@ module RZWaveWay
       cc_classes
     end
 
+    def contacts_controller_periodically?
+      (@command_classes.has_key? CommandClass::WAKEUP) && (@contact_frequency > 0)
+    end
+
     def to_json
       attributes = {
         'deviceId' => @id,
