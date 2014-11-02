@@ -43,7 +43,11 @@ module RZWaveWay
       if(results.has_key?('devices'))
         results['devices'].each do |device_id,device_data_tree|
           device_id = device_id.to_i
-          @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree)
+          if device_id > 1
+            device = ZWaveDevice.new(device_id, device_data_tree)
+            device.contact_frequency = 300 unless device.contacts_controller_periodically?
+            @devices[device_id] = device
+          end
         end
       end
     end
@@ -53,6 +57,7 @@ module RZWaveWay
     end
 
     def process_events
+      check_devices
       updates = get_zway_data_tree_updates
       events = devices_process updates
       check_not_alive_devices(events)
@@ -63,6 +68,19 @@ module RZWaveWay
 
     DATA_TREE_BASE_PATH='/ZWaveAPI/Data/'
     RUN_BASE_PATH='/ZWaveAPI/Run/'
+
+    def check_devices
+      @devices.values.each do |device|
+        unless device.contacts_controller_periodically?
+          current_time = Time.now.to_i
+          # TODO ensure last_contact_time is set in the device initializer
+          if current_time > device.next_contact_time - 60
+            # TODO limit the number of no op
+            run_zway_no_operation device.id
+          end
+        end
+      end
+    end
 
     def check_not_alive_devices(events)
       @devices.values.each do |device|
@@ -135,15 +153,23 @@ module RZWaveWay
       else
         command_path += "#{function_name}()"
       end
+      run_zway command_path
+    end
+
+    def run_zway_no_operation device_id
+      run_zway "devices[#{device_id}].SendNoOperation()"
+    end
+
+    def run_zway command_path
       begin
         uri = URI.encode(@base_uri + RUN_BASE_PATH + command_path, '[]')
         response = @http_client.get(uri)
         unless response.ok?
           $log.error(response.reason)
-          $log.error(e.backtrace)
         end
       rescue StandardError => e
         $log.error("Failed to communicate with ZWay HTTP server: #{e}")
+        $log.error(e.backtrace)
       end
     end
   end

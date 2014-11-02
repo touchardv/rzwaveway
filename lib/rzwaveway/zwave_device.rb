@@ -32,6 +32,10 @@ module RZWaveWay
       (@command_classes.has_key? CommandClass::WAKEUP) && (@contact_frequency > 0)
     end
 
+    def next_contact_time
+      @last_contact_time + (@contact_frequency * (1 + @missed_contact_count) * 1.1)
+    end
+
     def to_json
       attributes = {
         'deviceId' => @id,
@@ -70,7 +74,6 @@ module RZWaveWay
       return if @dead
       if @contact_frequency > 0
         current_time = Time.now.to_i
-        next_contact_time = @last_contact_time + (@contact_frequency * (1 + @missed_contact_count) * 1.1)
         if current_time > next_contact_time
           count = ((current_time - @last_contact_time) / @contact_frequency).to_i
           if count > MAXIMUM_MISSED_CONTACT
