@@ -74,8 +74,7 @@ module RZWaveWay
         unless device.contacts_controller_periodically?
           current_time = Time.now.to_i
           # TODO ensure last_contact_time is set in the device initializer
-          if current_time > device.next_contact_time - 60
-            # TODO limit the number of no op
+          if (current_time % 10 == 0) && (current_time > device.next_contact_time - 60)
             run_zway_no_operation device.id
           end
         end

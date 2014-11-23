@@ -7,8 +7,18 @@ module SpecHelpers
     SecureRandom.random_number(1000000)
   end
 
-  def create_device_data(command_classes_data = {})
-    {'instances' => {'0' => {'commandClasses' => command_classes_data}}}
+  def create_device_data(command_classes_data = {}, last_contact_time = 0)
+    {
+      'data' => {
+        'lastReceived' => {
+          'updateTime' => last_contact_time
+        },
+        'lastSend' => {
+          'updateTime' => last_contact_time
+        }
+      },
+      'instances' => {'0' => {'commandClasses' => command_classes_data}}
+    }
   end
 end
 

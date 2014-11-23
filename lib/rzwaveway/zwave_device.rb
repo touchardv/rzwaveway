@@ -2,6 +2,7 @@ require 'json'
 
 module RZWaveWay
   class ZWaveDevice
+    include CommandClass
     include CommandClasses
 
     attr_reader :id
@@ -9,27 +10,13 @@ module RZWaveWay
     attr_accessor :contact_frequency
 
     def initialize(id, data)
-      @dead = false
       @id = id
-      @last_contact_time = 0
-      @missed_contact_count = 0
-      @contact_frequency = 0
-      @properties = {}
-      @command_classes = create_commandclasses_from data
+      initialize_from data
       $log.info "Created ZWaveDevice with id='#{id}'"
     end
 
-    def create_commandclasses_from(data)
-      cc_classes = {}
-      data['instances']['0']['commandClasses'].each do |id, sub_tree|
-        cc_id = id.to_i
-        cc_classes[cc_id] = CommandClasses::Factory.instance.instantiate(cc_id, sub_tree, self)
-      end
-      cc_classes
-    end
-
     def contacts_controller_periodically?
-      (@command_classes.has_key? CommandClass::WAKEUP) && (@contact_frequency > 0)
+      support_commandclass? CommandClass::WAKEUP
     end
 
     def next_contact_time
@@ -55,7 +42,7 @@ module RZWaveWay
       @command_classes.has_key? command_class_id
     end
 
-    def process(updates)
+    def process updates
       events = []
       updates_per_commandclass = group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
@@ -119,7 +106,30 @@ module RZWaveWay
 
     MAXIMUM_MISSED_CONTACT = 10
 
-    def group_per_commandclass(updates)
+    def create_commandclasses_from data
+      cc_classes = {}
+      data['instances']['0']['commandClasses'].each do |id, sub_tree|
+        cc_id = id.to_i
+        cc_classes[cc_id] = CommandClasses::Factory.instance.instantiate(cc_id, sub_tree, self)
+      end
+      cc_classes
+    end
+
+    def initialize_from data
+      last_contact_times = [
+        find('data.lastReceived.updateTime', data),
+        find('data.lastSend.updateTime', data)
+      ]
+      @last_contact_time = last_contact_times.max
+
+      @dead = false
+      @missed_contact_count = 0
+      @contact_frequency = 0
+      @properties = {}
+      @command_classes = create_commandclasses_from data
+    end
+
+    def group_per_commandclass updates
       other_updates = {}
       updates_per_commandclass = {}
       updates.each do | key, value |

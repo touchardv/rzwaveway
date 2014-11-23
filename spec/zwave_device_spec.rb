@@ -4,15 +4,40 @@ module RZWaveWay
   describe ZWaveDevice do
     let(:now) { Time.now }
     let(:device) do
-      ZWaveDevice.new(create_id, create_device_data({CommandClass::WAKEUP =>
-                                                     {
-                                                       'data' => {
-                                                         'interval' => { 'value' => 300, 'updateTime' => 0 },
-                                                         'lastSleep' => { 'value' => 0, 'updateTime' => 0 },
-                                                         'lastWakeup' => { 'value' => 0, 'updateTime' => 0 }
-                                                       }
-                                                     }
-                                                     }))
+      ZWaveDevice.new(create_id,
+                      create_device_data({CommandClass::WAKEUP =>
+                                          {
+                                            'data' => {
+                                              'interval' => { 'value' => 300, 'updateTime' => 0 },
+                                              'lastSleep' => { 'value' => 1390251561, 'updateTime' => 0 },
+                                              'lastWakeup' => { 'value' => 1390251561, 'updateTime' => 0 }
+                                            }
+                                          }
+                                          }))
+    end
+
+    describe '#new' do
+      it 'sets last contact time from data (wake up command class)' do
+        expect(device.last_contact_time).to eq 1390251561
+      end
+
+      it 'sets the last contact time from data (device data > wake up command class)' do
+        battery_device = ZWaveDevice.new(create_id, create_device_data({CommandClass::WAKEUP =>
+                                                                        {
+                                                                          'data' => {
+                                                                            'interval' => { 'value' => 300, 'updateTime' => 0 },
+                                                                            'lastSleep' => { 'value' => 1390251000, 'updateTime' => 0 },
+                                                                            'lastWakeup' => { 'value' => 1390251000, 'updateTime' => 0 }
+                                                                          }
+                                                                        }
+                                                                        }, 1390252000))
+        expect(battery_device.last_contact_time).to eq 1390252000
+      end
+
+      it 'sets the last contact time from data (device data)' do
+        ac_powered_device = ZWaveDevice.new(create_id, create_device_data({}, 1390252000))
+        expect(ac_powered_device.last_contact_time).to eq 1390252000
+      end
     end
 
     describe '#contacts_controller_periodically?' do
