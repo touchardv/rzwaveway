@@ -1,7 +1,7 @@
 module RZWaveWay
   module Extensions
     class SSASirenStrobeAlarm
-      include CommandClasses
+      include CommandClass
 
       def initialize(device_id)
         @device_id = device_id
