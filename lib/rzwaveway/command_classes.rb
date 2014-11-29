@@ -2,6 +2,7 @@ require 'singleton'
 
 require_relative 'command_class'
 require_relative 'command_classes/battery'
+require_relative 'command_classes/switch_multi_level'
 require_relative 'command_classes/sensor_binary'
 require_relative 'command_classes/wake_up'
 
@@ -32,6 +33,7 @@ module RZWaveWay
       private
 
       CLASSES = {
+        SWITCH_MULTI_LEVEL => CommandClasses::SwitchMultiLevel,
         SENSOR_BINARY => CommandClasses::SensorBinary,
         WAKEUP => CommandClasses::WakeUp,
         BATTERY => CommandClasses::Battery

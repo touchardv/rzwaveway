@@ -39,6 +39,9 @@ module RZWaveWay
     end
   end
 
+  class MultiLevelEvent < LevelEvent
+  end
+
   class BatteryValueEvent
     attr_reader :device_id
     attr_reader :time

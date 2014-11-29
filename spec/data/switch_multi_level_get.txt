@@ -1,0 +1,24 @@
+{
+  "devices.6.data.lastSend": {
+      "name": "lastSend",
+      "value": 38650858,
+      "type": "int",
+      "invalidateTime": 1416820647,
+      "updateTime": 1417258409
+    },
+    "devices.6.data.lastReceived": {
+      "name": "lastReceived",
+      "value": 0,
+      "type": "int",
+      "invalidateTime": 1392567359,
+      "updateTime": 1417258409
+    },
+    "devices.6.instances.0.commandClasses.38.data.level": {
+      "name": "level",
+      "value": 0,
+      "type": "int",
+      "invalidateTime": 1417258408,
+      "updateTime": 1417258409
+    }
+  }
+}
