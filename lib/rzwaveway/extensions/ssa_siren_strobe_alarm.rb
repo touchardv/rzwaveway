@@ -1,39 +1,52 @@
 module RZWaveWay
   module Extensions
     class SSASirenStrobeAlarm
-      include CommandClass
-
-      def initialize(device_id)
-        @device_id = device_id
+      def initialize device
+        @device = device
       end
 
       def disable
-        set_value(0)
+        set DISABLED
       end
 
       def enable
-        set_value(STROBE + SIREN)
+        set(STROBE + SIREN)
       end
 
       def enable_siren
-        set_value(SIREN)
+        set SIREN
       end
 
       def enable_strobe
-        set_value(STROBE)
+        set STROBE
       end
 
-      def refresh_value
-        RZWaveWay::ZWay.instance.execute(@device_id, SWITCH_MULTI_LEVEL, :Get)
+      def level
+        case @device.SwitchMultiLevel.level
+        when DISABLED
+          :disabled
+        when STROBE
+          :strobe
+        when SIREN
+          :siren
+        else
+          :strobe_and_siren
+        end
+      end
+
+      def level!
+        @device.SwitchMultiLevel.get
+        nil
       end
 
       private
 
+      DISABLED = 0
       STROBE = 33
       SIREN = 66
 
-      def set_value(value)
-        RZWaveWay::ZWay.instance.execute(@device_id, SWITCH_MULTI_LEVEL, :Set, value)
+      def set level
+        @device.SwitchMultiLevel.set level
       end
     end
   end

@@ -110,7 +110,10 @@ module RZWaveWay
       cc_classes = {}
       data['instances']['0']['commandClasses'].each do |id, sub_tree|
         cc_id = id.to_i
-        cc_classes[cc_id] = CommandClasses::Factory.instance.instantiate(cc_id, sub_tree, self)
+        cc_class = CommandClasses::Factory.instance.instantiate(cc_id, sub_tree, self)
+        cc_classes[cc_id] = cc_class
+        cc_class_name = cc_class.class.name.split('::').last
+        self.class.send(:define_method, cc_class_name) { cc_class } unless cc_class_name == 'Dummy'
       end
       cc_classes
     end

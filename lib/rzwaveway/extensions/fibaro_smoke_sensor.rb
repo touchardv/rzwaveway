@@ -1,15 +1,11 @@
 module RZWaveWay
   module Extensions
     class FibaroSmokeSensor
-      include CommandClasses
-
-      def initialize(device_id)
-        @device_id = device_id
+      def initialize device
+        @device = device
       end
 
-      def refresh_temperature
-        RZWaveWay::ZWay.instance.execute(@device_id, SENSOR_MULTI_LEVEL, :Get)
-      end
+      # TODO add some usefull methods here for this kind of device
     end
   end
 end

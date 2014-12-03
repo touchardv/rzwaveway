@@ -4,9 +4,10 @@ module RZWaveWay
       include CommandClass
 
       def initialize(data, device)
-        device.add_property(:level,
-                            find('data.level.value', data),
-                            find('data.level.updateTime', data))
+        @device = device
+        @device.add_property(:level,
+                             find('data.level.value', data),
+                             find('data.level.updateTime', data))
       end
 
       def process(updates, device)
@@ -20,12 +21,16 @@ module RZWaveWay
         end
       end
 
-      def refresh_value device_id
-        RZWaveWay::ZWay.instance.execute(device_id, SWITCH_MULTI_LEVEL, :Get)
+      def level
+        @device.get_property(:level)[0]
       end
 
-      def set_value(value, device_id)
-        RZWaveWay::ZWay.instance.execute(device_id, SWITCH_MULTI_LEVEL, :Set, value)
+      def get
+        RZWaveWay::ZWay.instance.execute(@device.id, SWITCH_MULTI_LEVEL, :Get)
+      end
+
+      def set value
+        RZWaveWay::ZWay.instance.execute(@device.id, SWITCH_MULTI_LEVEL, :Set, value)
       end
     end
   end
