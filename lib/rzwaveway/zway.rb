@@ -46,15 +46,14 @@ module RZWaveWay
       @devices = {}
       @event_handlers = {}
       @update_time = '0'
-      results = get_zway_data_tree_updates
-      if(results.has_key?('devices'))
-        results['devices'].each do |device_id,device_data_tree|
-          device_id = device_id.to_i
-          if device_id > 1
-            device = ZWaveDevice.new(device_id, device_data_tree)
-            device.contact_frequency = 300 unless device.contacts_controller_periodically?
-            @devices[device_id] = device
-          end
+      loop do
+        results = get_zway_data_tree_updates
+        if results.has_key?('devices')
+          results['devices'].each {|device_id,device_data_tree| create_device(device_id.to_i, device_data_tree)}
+          break
+        else
+          sleep 1.0
+          $log.warn 'No devices found at start-up, retrying'
         end
       end
     end
@@ -92,6 +91,14 @@ module RZWaveWay
       @devices.values.each do |device|
         event = device.process_alive_check
         events << event if event
+      end
+    end
+
+    def create_device(device_id, device_data_tree)
+      if device_id > 1
+        device = ZWaveDevice.new(device_id, device_data_tree)
+        device.contact_frequency = 300 unless device.contacts_controller_periodically?
+        @devices[device_id] = device
       end
     end
 
