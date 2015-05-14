@@ -10,6 +10,9 @@ module SpecHelpers
   def create_device_data(command_classes_data = {}, last_contact_time = 0)
     {
       'data' => {
+        'givenName' => {
+          'value' => 'device name'
+          },
         'lastReceived' => {
           'updateTime' => last_contact_time
         },

@@ -5,6 +5,7 @@ module RZWaveWay
     include CommandClass
     include CommandClasses
 
+    attr_reader :name
     attr_reader :id
     attr_reader :last_contact_time
     attr_accessor :contact_frequency
@@ -12,7 +13,7 @@ module RZWaveWay
     def initialize(id, data)
       @id = id
       initialize_from data
-      $log.info "Created ZWaveDevice with id='#{id}'"
+      $log.info "Created ZWaveDevice with name='#{name}'' (id='#{id})'"
     end
 
     def contacts_controller_periodically?
@@ -25,6 +26,7 @@ module RZWaveWay
 
     def to_json
       attributes = {
+        'name' => @name,
         'deviceId' => @id,
         # TODO remove these obsolete attributes (kept for backward compatibility)
         'lastSleepTime' => @last_contact_time,
@@ -119,6 +121,7 @@ module RZWaveWay
     end
 
     def initialize_from data
+      @name = find('data.givenName.value', data)
       last_contact_times = [
         find('data.lastReceived.updateTime', data),
         find('data.lastSend.updateTime', data)

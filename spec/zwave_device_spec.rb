@@ -38,6 +38,10 @@ module RZWaveWay
         ac_powered_device = ZWaveDevice.new(create_id, create_device_data({}, 1390252000))
         expect(ac_powered_device.last_contact_time).to eq 1390252000
       end
+
+      it 'sets the name from data' do
+        expect(device.name).to eq 'device name'
+      end
     end
 
     describe '#contacts_controller_periodically?' do
