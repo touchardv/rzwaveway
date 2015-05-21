@@ -37,9 +37,10 @@ module RZWaveWay
       clazz.new(device)
     end
 
-    def setup(hostname, adapter = :httpclient)
+    def setup(hostname, *adapter_params)
+      adapter_params = :httpclient if adapter_params.compact.empty?
       @base_uri="http://#{hostname}:8083"
-      @connection = Faraday.new {|faraday| faraday.adapter adapter}
+      @connection = Faraday.new {|faraday| faraday.adapter *adapter_params}
     end
 
     def start
