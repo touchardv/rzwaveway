@@ -1,6 +1,6 @@
 require 'singleton'
 
-require 'httpclient'
+require 'faraday'
 require 'log4r'
 require 'json'
 
@@ -37,9 +37,9 @@ module RZWaveWay
       clazz.new(device)
     end
 
-    def setup(hostname)
+    def setup(hostname, adapter = :httpclient)
       @base_uri="http://#{hostname}:8083"
-      @http_client = HTTPClient.new
+      @connection = Faraday.new {|faraday| faraday.adapter adapter}
     end
 
     def start
@@ -146,8 +146,8 @@ module RZWaveWay
       results = {}
       url = @base_uri + DATA_TREE_BASE_PATH + "#{@update_time}"
       begin
-        response = @http_client.get(url)
-        if response.ok?
+        response = @connection.get(url)
+        if response.success?
           results = JSON.parse response.body
           @update_time = results.delete('updateTime')
         else
@@ -196,8 +196,8 @@ module RZWaveWay
     def run_zway command_path
       begin
         uri = URI.encode(@base_uri + RUN_BASE_PATH + command_path, '[]')
-        response = @http_client.get(uri)
-        unless response.ok?
+        response = @connection.get(uri)
+        unless response.success?
           $log.error(response.reason)
         end
       rescue StandardError => e

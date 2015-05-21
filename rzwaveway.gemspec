@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
 
   dependencies = [
     [:runtime, 'log4r', '~> 1.1.10'],
-    [:runtime, 'httpclient', '~> 2.3.4.1'],
+    [:runtime, 'faraday'],
     [:development, 'bundler', '~> 1.6.0'],
     [:development, 'rspec', '~> 3.0.0']
   ]
