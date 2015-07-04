@@ -1,6 +1,7 @@
 module RZWaveWay
   module CommandClass
     BASIC = 32
+    SWITCH_BINARY = 37
     SWITCH_MULTI_LEVEL = 38
     SENSOR_BINARY = 48
     SENSOR_MULTI_LEVEL = 49
