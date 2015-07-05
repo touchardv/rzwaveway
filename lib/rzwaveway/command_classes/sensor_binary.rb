@@ -4,24 +4,29 @@ module RZWaveWay
       include CommandClass
 
       def initialize(data, device)
-        device.add_property(:level,
-                            find('data.1.level.value', data),
-                            find('data.1.level.updateTime', data))
+        @device = device
+        @device.add_property(:level,
+                             find('data.1.level.value', data),
+                             find('data.1.level.updateTime', data))
       end
 
-      def process(updates, device)
+      def process(updates)
         if updates.keys.include?('data.1')
           data = updates['data.1']['level']
           value = data['value']
           updateTime = data['updateTime']
-          if device.update_property(:level, value, updateTime)
-            return LevelEvent.new(device.id, updateTime, value)
+          if @device.update_property(:level, value, updateTime)
+            return LevelEvent.new(@device.id, updateTime, value)
           end
         end
       end
 
-      def refresh(device_id)
-        RZWaveWay::ZWay.instance.execute(device_id, SENSOR_BINARY, :Get)
+      def level
+        @device.get_property(:level)[0]
+      end
+
+      def get
+        RZWaveWay::ZWay.instance.execute(@device.id, SENSOR_BINARY, :Get)
       end
     end
   end

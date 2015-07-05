@@ -13,7 +13,7 @@ module RZWaveWay
     def initialize(id, data)
       @id = id
       initialize_from data
-      $log.info "Created ZWaveDevice with name='#{name}'' (id='#{id})'"
+      $log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
     end
 
     def contacts_controller_periodically?
@@ -49,7 +49,7 @@ module RZWaveWay
       updates_per_commandclass = group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
         if @command_classes.has_key? cc
-          event = @command_classes[cc].process(values, self)
+          event = @command_classes[cc].process(values)
           events << event if event
         else
           $log.warn "Could not find command class: '#{cc}'"

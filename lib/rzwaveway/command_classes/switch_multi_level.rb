@@ -10,13 +10,13 @@ module RZWaveWay
                              find('data.level.updateTime', data))
       end
 
-      def process(updates, device)
+      def process(updates)
         if updates.keys.include?('data.level')
           data = updates['data.level']
           value = data['value']
           updateTime = data['updateTime']
-          if device.update_property(:level, value, updateTime)
-            return MultiLevelEvent.new(device.id, updateTime, value)
+          if @device.update_property(:level, value, updateTime)
+            return MultiLevelEvent.new(@device.id, updateTime, value)
           end
         end
       end
@@ -29,7 +29,7 @@ module RZWaveWay
         RZWaveWay::ZWay.instance.execute(@device.id, SWITCH_MULTI_LEVEL, :Get)
       end
 
-      def set value
+      def set(value)
         RZWaveWay::ZWay.instance.execute(@device.id, SWITCH_MULTI_LEVEL, :Set, value)
       end
     end

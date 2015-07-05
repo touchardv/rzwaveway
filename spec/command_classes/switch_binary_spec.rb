@@ -21,7 +21,7 @@ module RZWaveWay
 
       describe '#process' do
         it 'does nothing when it processes no updates' do
-          expect(command_class.process({}, device)).to be_nil
+          expect(command_class.process({})).to be_nil
         end
 
         it 'returns a multi level event' do
@@ -30,7 +30,7 @@ module RZWaveWay
               'value' => true,
               'updateTime' => 1405102860
           }}
-          event = command_class.process(updates, device)
+          event = command_class.process(updates)
           expect(event.class).to be RZWaveWay::LevelEvent
           expect(event.level).to eq true
           expect(event.device_id).to eq device.id

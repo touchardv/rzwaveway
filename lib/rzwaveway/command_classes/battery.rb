@@ -4,24 +4,29 @@ module RZWaveWay
       include CommandClass
 
       def initialize(data, device)
-        device.add_property(:battery_level,
-                            find('data.last.value', data),
-                            find('data.last.updateTime', data))
+        @device = device
+        @device.add_property(:battery_level,
+                             find('data.last.value', data),
+                             find('data.last.updateTime', data))
       end
 
-      def process(updates, device)
+      def process(updates)
         if updates.keys.include?('data.last')
           data = updates['data.last']
           value = data['value']
           updateTime = data['updateTime']
-          if device.update_property(:battery_level, value, updateTime)
-            return BatteryValueEvent.new(device.id, updateTime, value)
+          if @device.update_property(:battery_level, value, updateTime)
+            return BatteryValueEvent.new(@device.id, updateTime, value)
           end
         end
       end
 
-      def refresh(device_id)
-        RZWaveWay::ZWay.instance.execute(device_id, BATTERY, :Get)
+      def battery_value
+        @device.get_property(:battery_level)[0]
+      end
+
+      def get
+        RZWaveWay::ZWay.instance.execute(@device.id, BATTERY, :Get)
       end
     end
   end

@@ -26,7 +26,7 @@ module RZWaveWay
 
       describe '#process' do
         it 'does nothing when it processes no updates' do
-          expect(command_class.process({}, device)).to be_nil
+          expect(command_class.process({})).to be_nil
         end
 
         it 'returns an alive event' do
@@ -34,7 +34,7 @@ module RZWaveWay
             'data.lastWakeup' => {'value' => 1395247772, 'updateTime' => 1395247772},
             'data.lastSleep' => {'value' => 1395247772, 'updateTime' => 1395247772}
           }
-          event = command_class.process(updates, device)
+          event = command_class.process(updates)
           expect(event.class).to be RZWaveWay::AliveEvent
           expect(event.device_id).to eq device.id
           expect(event.time).to eq 1395247772

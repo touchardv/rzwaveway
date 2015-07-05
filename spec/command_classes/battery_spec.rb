@@ -22,7 +22,7 @@ module RZWaveWay
 
       describe '#process' do
         it 'does nothing when it processes no updates' do
-          expect(command_class.process({}, device)).to be_nil
+          expect(command_class.process({})).to be_nil
         end
 
         it 'returns a battery event' do
@@ -32,7 +32,7 @@ module RZWaveWay
               'type' => 'int',
               'updateTime' => 1409681762
           }}
-          event = command_class.process(updates, device)
+          event = command_class.process(updates)
           expect(event.class).to be RZWaveWay::BatteryValueEvent
           expect(event.value).to eq 50
           expect(event.device_id).to eq device.id
