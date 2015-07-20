@@ -199,7 +199,8 @@ module RZWaveWay
         uri = URI.encode(@base_uri + RUN_BASE_PATH + command_path, '[]')
         response = @connection.get(uri)
         unless response.success?
-          $log.error(response.reason)
+          $log.error(response.status)
+          $log.error(response.body)
         end
       rescue StandardError => e
         $log.error("Failed to communicate with ZWay HTTP server: #{e}")
