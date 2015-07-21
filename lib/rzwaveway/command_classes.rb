@@ -15,7 +15,7 @@ module RZWaveWay
       def initialize
       end
 
-      def process(updates, device)
+      def process(updates)
       end
     end
 
