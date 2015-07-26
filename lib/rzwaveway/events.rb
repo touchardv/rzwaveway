@@ -12,10 +12,12 @@ module RZWaveWay
   class NotAliveEvent
     attr_reader :device_id
     attr_reader :time_delay
+    attr_reader :missed_count
 
-    def initialize(device_id, time_delay)
+    def initialize(device_id, time_delay, missed_count)
       @device_id = device_id
       @time_delay = time_delay
+      @missed_count = missed_count
     end
   end
 

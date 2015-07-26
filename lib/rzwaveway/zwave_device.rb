@@ -63,14 +63,15 @@ module RZWaveWay
       return if @dead
       if @contact_frequency > 0
         current_time = Time.now.to_i
-        if current_time > next_contact_time
+        delta = current_time - next_contact_time
+        if delta > 0
           count = ((current_time - @last_contact_time) / @contact_frequency).to_i
           if count > MAXIMUM_MISSED_CONTACT
             @dead = true
             DeadEvent.new(@id)
           elsif count > @missed_contact_count
             @missed_contact_count = count
-            NotAliveEvent.new(@id, 0)
+            NotAliveEvent.new(@id, delta, count)
           end
         end
       end
