@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
     [:runtime, 'log4r', '~> 1.1.10'],
     [:runtime, 'faraday'],
     [:runtime, 'httpclient'],
-    [:development, 'bundler', '~> 1.6.0'],
+    [:development, 'bundler', '~> 1.0'],
     [:development, 'rspec', '~> 3.0.0']
   ]
 
