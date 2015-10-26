@@ -1,11 +1,14 @@
+$LOAD_PATH.unshift 'lib'
+require 'rzwaveway/version'
+
 Gem::Specification.new do |s|
   s.name = 'rzwaveway'
-  s.version = '0.0.4'
+  s.version = RZWaveWay::VERSION
   s.authors = ['Vincent Touchard']
   s.date = %q{2014-02-18}
   s.summary = 'ZWave API for ZWay'
   s.description = 'A Ruby API to use the Razberry ZWave ZWay interface'
-  s.email = 'vincentoo.ignore@yahoo.com'
+  s.email = 'touchardv@yahoo.com'
   s.homepage = 'https://github.com/touchardv/rzwaveway'
   s.files = `git ls-files`.split("\n")
   s.has_rdoc = false
