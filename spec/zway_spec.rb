@@ -5,7 +5,7 @@ module RZWaveWay
     let(:http_stubs) { Faraday::Adapter::Test::Stubs.new }
     let(:zway) do
       zway = ZWay.instance
-      zway.setup('dummy', :test, http_stubs)
+      zway.setup({ hostname: 'dummy' }, :test, http_stubs)
       zway
     end
 
