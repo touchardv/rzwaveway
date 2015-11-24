@@ -10,9 +10,10 @@ module RZWaveWay
     include Log4r
 
     attr_reader :devices
+    attr_reader :log
 
     def initialize
-      $log = Logger.new 'RZWaveWay'
+      @log = Log4r::Logger.new 'RZWaveWay'
       formatter = PatternFormatter.new(:pattern => "[%l] %d - %m")
       outputter = Outputter.stdout
       outputter.formatter = formatter
@@ -20,7 +21,7 @@ module RZWaveWay
       file_outputter = RollingFileOutputter.new('file', filename: 'rzwaveway.log', maxsize: 1048576, trunc: 86400)
       file_outputter.formatter = formatter
       file_outputter.level = Log4r::DEBUG
-      $log.outputters = [Outputter.stdout, file_outputter]
+      log.outputters = [Outputter.stdout, file_outputter]
     end
 
     def execute(device_id, command_class, command_class_function, argument = nil)
@@ -54,7 +55,7 @@ module RZWaveWay
           break
         else
           sleep 1.0
-          $log.warn 'No devices found at start-up, retrying'
+          log.warn 'No devices found at start-up, retrying'
         end
       end
     end
@@ -109,7 +110,7 @@ module RZWaveWay
         if handler
           handler.call(event)
         else
-          $log.warn "No event handler for #{event.class}"
+          log.warn "No event handler for #{event.class}"
         end
       end
     end
@@ -122,7 +123,7 @@ module RZWaveWay
           device_events = @devices[id].process updates
           events += device_events unless device_events.empty?
         else
-          $log.warn "Could not find device with id '#{id}'"
+          log.warn "Could not find device with id '#{id}'"
         end
       end
       events
@@ -137,7 +138,7 @@ module RZWaveWay
           updates_per_device[device_id] = {} unless(updates_per_device.has_key?(device_id))
           updates_per_device[device_id][match_data.post_match] = value
         else
-          $log.debug "No device group match for key='#{key}'"
+          log.debug "No device group match for key='#{key}'"
         end
       end
       updates_per_device
@@ -152,10 +153,10 @@ module RZWaveWay
           results = JSON.parse response.body
           @update_time = results.delete('updateTime')
         else
-          $log.error(response.reason)
+          log.error(response.reason)
         end
       rescue StandardError => e
-        $log.error("Failed to communicate with ZWay HTTP server: #{e}")
+        log.error("Failed to communicate with ZWay HTTP server: #{e}")
       end
       results
     end
@@ -199,12 +200,12 @@ module RZWaveWay
         uri = URI.encode(@base_uri + RUN_BASE_PATH + command_path, '[]')
         response = @connection.get(uri)
         unless response.success?
-          $log.error(response.status)
-          $log.error(response.body)
+          log.error(response.status)
+          log.error(response.body)
         end
       rescue StandardError => e
-        $log.error("Failed to communicate with ZWay HTTP server: #{e}")
-        $log.error(e.backtrace)
+        log.error("Failed to communicate with ZWay HTTP server: #{e}")
+        log.error(e.backtrace)
       end
     end
   end

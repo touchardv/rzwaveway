@@ -4,6 +4,7 @@ module RZWaveWay
   class ZWaveDevice
     include CommandClass
     include CommandClasses
+    include Logger
 
     attr_reader :name
     attr_reader :id
@@ -13,7 +14,7 @@ module RZWaveWay
     def initialize(id, data)
       @id = id
       initialize_from data
-      $log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
+      log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
     end
 
     def contacts_controller_periodically?
@@ -52,7 +53,7 @@ module RZWaveWay
           event = @command_classes[cc].process(values)
           events << event if event
         else
-          $log.warn "Could not find command class: '#{cc}'"
+          log.warn "Could not find command class: '#{cc}'"
         end
       end
       process_device_data(updates, events)
