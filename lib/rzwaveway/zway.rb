@@ -13,15 +13,7 @@ module RZWaveWay
     attr_reader :log
 
     def initialize
-      @log = Log4r::Logger.new 'RZWaveWay'
-      formatter = PatternFormatter.new(:pattern => "[%l] %d - %m")
-      outputter = Outputter.stdout
-      outputter.formatter = formatter
-      outputter.level = Log4r::INFO
-      file_outputter = RollingFileOutputter.new('file', filename: 'rzwaveway.log', maxsize: 1048576, trunc: 86400)
-      file_outputter.formatter = formatter
-      file_outputter.level = Log4r::DEBUG
-      log.outputters = [Outputter.stdout, file_outputter]
+      @log = default_logger
     end
 
     def execute(device_id, command_class, command_class_function, argument = nil)
@@ -44,6 +36,7 @@ module RZWaveWay
       adapter_params = :httpclient if adapter_params.compact.empty?
       @base_uri="http://#{hostname}:#{port}"
       @connection = Faraday.new {|faraday| faraday.adapter *adapter_params}
+      @log = options[:logger] if options.has_key? :logger
     end
 
     def start
@@ -104,6 +97,10 @@ module RZWaveWay
         device.contact_frequency = 300 unless device.contacts_controller_periodically?
         @devices[device_id] = device
       end
+    end
+
+    def default_logger
+      Log4r::Logger.new 'RZWaveWay'
     end
 
     def deliver_to_handlers events
