@@ -1,3 +1,3 @@
 module RZWaveWay
-  VERSION = '0.0.8'
+  VERSION = '0.0.9.pre1'
 end
