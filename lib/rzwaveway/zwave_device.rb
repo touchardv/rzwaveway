@@ -27,16 +27,16 @@ module RZWaveWay
 
     def to_json
       attributes = {
-        'name' => @name,
-        'deviceId' => @id,
+        name: @name,
+        deviceId: @id,
         # TODO remove these obsolete attributes (kept for backward compatibility)
-        'lastSleepTime' => @last_contact_time,
-        'lastWakeUpTime' => @last_contact_time,
-        'wakeUpInterval' => @contact_frequency
+        lastSleepTime: @last_contact_time,
+        lastWakeUpTime: @last_contact_time,
+        wakeUpInterval: @contact_frequency,
         # ---
         # 'lastContactTime' => @last_contact_time,
         # 'contactFrequency' => @contact_frequency,
-        # 'properties' => @properties.to_json
+        properties: @properties
       }
       attributes.to_json
     end
@@ -87,20 +87,22 @@ module RZWaveWay
       end
     end
 
-    def add_property(name, value, updateTime)
-      @properties[name] = [value, updateTime]
+    def add_property(options)
+      name = options.delete(:name)
+      read_only = options.delete(:read_only) || true
+      @properties[name] = options
     end
 
     def get_property(name)
-      @properties[name].dup
+      [ @properties[name][:value], @properties[name][:update_time] ]
     end
 
-    def update_property(name, value, updateTime)
+    def update_property(name, value, update_time)
       if @properties.has_key?(name)
         property = @properties[name]
-        if property[0] != value || property[1] < updateTime
-          property[0] = value
-          property[1] = updateTime
+        if property[:value] != value || property[:update_time] < update_time
+          property[:value] = value
+          property[:update_time] = update_time
           true
         end
       end

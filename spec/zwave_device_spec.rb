@@ -44,6 +44,15 @@ module RZWaveWay
       end
     end
 
+    describe '#add_property' do
+      it 'stores a property' do
+        property = { name: 'prop1', value: 123, update_time: Time.now.to_i, read_only: true }
+        device.add_property(property)
+
+        expect(device.get_property('prop1')).not_to be_nil
+      end
+    end
+
     describe '#contacts_controller_periodically?' do
       it 'returns true if device supports wake up cc' do
         expect(device.contacts_controller_periodically?).to be true

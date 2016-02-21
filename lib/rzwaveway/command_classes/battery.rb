@@ -5,9 +5,9 @@ module RZWaveWay
 
       def initialize(data, device)
         @device = device
-        @device.add_property(:battery_level,
-                             find('data.last.value', data),
-                             find('data.last.updateTime', data))
+        @device.add_property(name: :battery_level,
+                             value: find('data.last.value', data),
+                             update_time: find('data.last.updateTime', data))
       end
 
       def process(updates)

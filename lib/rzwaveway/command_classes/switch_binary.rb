@@ -5,9 +5,10 @@ module RZWaveWay
 
       def initialize(data, device)
         @device = device
-        @device.add_property(:level,
-                             find('data.level.value', data),
-                             find('data.level.updateTime', data))
+        @device.add_property(name: :level,
+                             value: find('data.level.value', data),
+                             update_time: find('data.level.updateTime', data),
+                             read_only: false)
       end
 
       def process(updates)
