@@ -17,7 +17,7 @@ module RZWaveWay
                              update_time: find('data.lastSleep.updateTime', data))
         @device.add_property(name: :wakeup_last_wakeup_time,
                              value: last_wakeup_time,
-                             update_time: find('data.lastSleep.updateTime', data))
+                             update_time: find('data.lastWakeup.updateTime', data))
 
         @device.contact_frequency = wakeup_interval
         @device.notify_contacted(last_wakeup_time)
