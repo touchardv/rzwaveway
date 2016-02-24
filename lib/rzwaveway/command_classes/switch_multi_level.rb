@@ -7,7 +7,8 @@ module RZWaveWay
         @device = device
         @device.add_property(name: :level,
                              value: find('data.level.value', data),
-                             update_time: find('data.level.updateTime', data))
+                             update_time: find('data.level.updateTime', data),
+                             read_only: false)
       end
 
       def process(updates)
