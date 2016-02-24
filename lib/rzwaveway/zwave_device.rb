@@ -25,22 +25,6 @@ module RZWaveWay
       @last_contact_time + (@contact_frequency * (1 + @missed_contact_count) * 1.1)
     end
 
-    def to_json
-      attributes = {
-        name: @name,
-        deviceId: @id,
-        # TODO remove these obsolete attributes (kept for backward compatibility)
-        lastSleepTime: @last_contact_time,
-        lastWakeUpTime: @last_contact_time,
-        wakeUpInterval: @contact_frequency,
-        # ---
-        # 'lastContactTime' => @last_contact_time,
-        # 'contactFrequency' => @contact_frequency,
-        properties: @properties
-      }
-      attributes.to_json
-    end
-
     def support_commandclass?(command_class_id)
       @command_classes.has_key? command_class_id
     end
@@ -87,14 +71,21 @@ module RZWaveWay
       end
     end
 
-    def add_property(options)
-      name = options.delete(:name)
-      read_only = options.delete(:read_only) || true
-      @properties[name] = options
+    def add_property(property)
+      name = property.delete(:name)
+      property[:read_only] = true unless property.has_key? :read_only
+      @properties[name] = property
     end
 
     def get_property(name)
-      [ @properties[name][:value], @properties[name][:update_time] ]
+      [
+        @properties[name][:value],
+        @properties[name][:update_time]
+      ]
+    end
+
+    def properties
+      @properties.reject { |_, property| property.has_key? :internal }
     end
 
     def update_property(name, value, update_time)

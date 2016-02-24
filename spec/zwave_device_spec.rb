@@ -53,6 +53,21 @@ module RZWaveWay
       end
     end
 
+    describe '#properties' do
+      it 'returns the name and value of all properties' do
+        device.add_property({ name: 'prop1', value: 123, update_time: 1390252000 })
+        device.add_property({ name: 'prop2', value: 456, update_time: 1390252000 })
+
+        expect(device.properties).to eq( 'prop1' => { value: 123, update_time: 1390252000, read_only: true },
+                                         'prop2' => { value: 456, update_time: 1390252000, read_only: true })
+      end
+
+      it 'does not include internal properties' do
+        device.add_property({ name: 'prop1', value: 123, update_time: 1390252000, internal: true })
+        expect(device.properties).to be_empty
+      end
+    end
+
     describe '#contacts_controller_periodically?' do
       it 'returns true if device supports wake up cc' do
         expect(device.contacts_controller_periodically?).to be true
