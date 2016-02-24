@@ -21,10 +21,6 @@ module RZWaveWay
         end
       end
 
-      def battery_value
-        @device.get_property(:battery_level)[0]
-      end
-
       def get
         RZWaveWay::ZWay.instance.execute(@device.id, BATTERY, :Get)
       end
