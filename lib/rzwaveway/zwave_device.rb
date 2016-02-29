@@ -72,9 +72,8 @@ module RZWaveWay
     end
 
     def add_property(property)
-      name = property.delete(:name)
       property[:read_only] = true unless property.has_key? :read_only
-      @properties[name] = property
+      @properties[property[:name]] = property
     end
 
     def get_property(name)
@@ -85,7 +84,7 @@ module RZWaveWay
     end
 
     def properties
-      @properties.reject { |_, property| property.has_key? :internal }
+      @properties.values.reject { |property| property.has_key? :internal }
     end
 
     def update_property(name, value, update_time)

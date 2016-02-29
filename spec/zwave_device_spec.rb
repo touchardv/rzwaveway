@@ -58,8 +58,10 @@ module RZWaveWay
         device.add_property({ name: 'prop1', value: 123, update_time: 1390252000 })
         device.add_property({ name: 'prop2', value: 456, update_time: 1390252000 })
 
-        expect(device.properties).to eq( 'prop1' => { value: 123, update_time: 1390252000, read_only: true },
-                                         'prop2' => { value: 456, update_time: 1390252000, read_only: true })
+        expect(device.properties).to eq([
+                                          {name: 'prop1', value: 123, update_time: 1390252000, read_only: true},
+                                          {name: 'prop2', value: 456, update_time: 1390252000, read_only: true}
+        ])
       end
 
       it 'does not include internal properties' do
