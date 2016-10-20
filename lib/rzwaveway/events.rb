@@ -1,4 +1,8 @@
+require 'ostruct'
+
 module RZWaveWay
+  class AlarmEvent < OpenStruct ; end
+
   class AliveEvent
     attr_reader :device_id
     attr_reader :time
