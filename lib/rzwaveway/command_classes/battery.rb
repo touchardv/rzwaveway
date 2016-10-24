@@ -16,7 +16,7 @@ module RZWaveWay
           value = data['value']
           updateTime = data['updateTime']
           if @device.update_property(:battery_level, value, updateTime)
-            return BatteryValueEvent.new(@device.id, updateTime, value)
+            return BatteryValueEvent.new(device_id: @device.id, time: updateTime, value: value)
           end
         end
       end

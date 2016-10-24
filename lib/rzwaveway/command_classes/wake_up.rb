@@ -33,7 +33,7 @@ module RZWaveWay
           updateTime = data['updateTime']
           if @device.update_property(:wakeup_last_wakeup_time, value, updateTime)
             @device.notify_contacted(value)
-            return AliveEvent.new(@device.id, value)
+            return AliveEvent.new(device_id: @device.id, time: value)
           end
         end
 

@@ -17,7 +17,7 @@ module RZWaveWay
           value = data['value']
           updateTime = data['updateTime']
           if @device.update_property(:level, value, updateTime)
-            return MultiLevelEvent.new(@device.id, updateTime, value)
+            return MultiLevelEvent.new(device_id: @device.id, time: updateTime, level: value)
           end
         end
       end
