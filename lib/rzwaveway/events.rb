@@ -5,7 +5,7 @@ module RZWaveWay
     def initialize(hash)
       raise ArgumentError, 'Hash can not be nil' unless hash
       raise ArgumentError, 'Missing device_id' unless hash.has_key? :device_id
-      hash[:time] = Time.now unless hash.has_key? :time
+      hash[:time] = Time.now.to_i unless hash.has_key? :time
 
       super(hash)
     end
