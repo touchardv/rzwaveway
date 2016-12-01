@@ -10,7 +10,7 @@ A Ruby library for communicating with the ZWave protocol stack from ZWay, runnin
 require 'rzwaveway'
 
 z_way = RZWaveWay::ZWay.instance
-z_way.setup('192.168.1.123')
+z_way.setup(hostname: '192.168.1.123', port: 8083)
 z_way.start
 ```
 
