@@ -24,8 +24,8 @@ module RZWaveWay
           name: property_name,
           value: find("#{options[:key]}.value", data),
           update_time: find("#{options[:key]}.updateTime", data),
-          read_only: options[:read_only] && true,
-          internal: options[:internal] || false
+          read_only: (options.has_key?(:read_only) ? options[:read_only] : true),
+          internal: (options.has_key?(:internal) ? options[:internal] : false)
         }
         device.add_property(property)
       end
