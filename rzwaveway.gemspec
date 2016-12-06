@@ -18,7 +18,8 @@ Gem::Specification.new do |s|
     [:runtime, 'faraday'],
     [:runtime, 'httpclient'],
     [:development, 'bundler', '~> 1.0'],
-    [:development, 'rspec', '~> 3.0.0']
+    [:development, 'rspec', '~> 3.0.0'],
+    [:development, 'pry-byebug']
   ]
 
   dependencies.each do |type, name, version|

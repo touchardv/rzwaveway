@@ -1,3 +1,4 @@
+require 'pry-byebug'
 require 'rzwaveway'
 require 'securerandom'
 
