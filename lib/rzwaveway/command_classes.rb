@@ -13,16 +13,12 @@ module RZWaveWay
     class Dummy
       include Singleton
 
-      def initialize
-      end
-
       def process(updates)
       end
     end
 
     class Factory
       include Singleton
-      include CommandClass
 
       def instantiate(id, data, device)
         if CLASSES.has_key? id
@@ -35,12 +31,12 @@ module RZWaveWay
       private
 
       CLASSES = {
-        SWITCH_BINARY => CommandClasses::SwitchBinary,
-        SWITCH_MULTI_LEVEL => CommandClasses::SwitchMultiLevel,
-        SENSOR_BINARY => CommandClasses::SensorBinary,
-        WAKEUP => CommandClasses::WakeUp,
-        ALARM => CommandClasses::Alarm,
-        BATTERY => CommandClasses::Battery
+        CommandClass::SWITCH_BINARY => CommandClasses::SwitchBinary,
+        CommandClass::SWITCH_MULTI_LEVEL => CommandClasses::SwitchMultiLevel,
+        CommandClass::SENSOR_BINARY => CommandClasses::SensorBinary,
+        CommandClass::WAKEUP => CommandClasses::WakeUp,
+        CommandClass::ALARM => CommandClasses::Alarm,
+        CommandClass::BATTERY => CommandClasses::Battery
       }
     end
   end

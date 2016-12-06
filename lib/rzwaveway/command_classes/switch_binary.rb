@@ -1,14 +1,13 @@
 module RZWaveWay
   module CommandClasses
-    class SwitchBinary
-      include CommandClass
+    class SwitchBinary < CommandClass
 
-      def initialize(data, device)
-        @device = device
-        @device.add_property(name: :level,
-                             value: find('data.level.value', data),
-                             update_time: find('data.level.updateTime', data),
-                             read_only: false)
+      def property_mappings
+        {
+          level: {
+            key: 'data.level'
+          }
+        }
       end
 
       def process(updates)

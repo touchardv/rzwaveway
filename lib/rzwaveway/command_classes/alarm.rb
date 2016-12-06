@@ -1,10 +1,9 @@
 module RZWaveWay
   module CommandClasses
-    class Alarm
-      include CommandClass
+    class Alarm < CommandClass
 
-      def initialize(data, device)
-        @device = device
+      def property_mappings
+        {}
       end
 
       def process(updates)

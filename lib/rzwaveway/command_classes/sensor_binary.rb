@@ -1,13 +1,13 @@
 module RZWaveWay
   module CommandClasses
-    class SensorBinary
-      include CommandClass
+    class SensorBinary < CommandClass
 
-      def initialize(data, device)
-        @device = device
-        @device.add_property(name: :level,
-                             value: find('data.1.level.value', data),
-                             update_time: find('data.1.level.updateTime', data))
+      def property_mappings
+        {
+          level: {
+            key: 'data.1.level'
+          }
+        }
       end
 
       def process(updates)

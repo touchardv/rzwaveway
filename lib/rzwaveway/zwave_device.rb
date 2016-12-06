@@ -2,7 +2,6 @@ require 'json'
 
 module RZWaveWay
   class ZWaveDevice
-    include CommandClass
     include CommandClasses
     include Logger
 
@@ -84,7 +83,7 @@ module RZWaveWay
     end
 
     def properties
-      @properties.values.reject { |property| property.has_key? :internal }
+      @properties.values.reject { |property| property[:internal] }
     end
 
     def update_property(name, value, update_time)
@@ -127,6 +126,16 @@ module RZWaveWay
       @contact_frequency = 0
       @properties = {}
       @command_classes = create_commandclasses_from data
+    end
+
+    def find(name, data)
+      parts = name.split '.'
+      result = data
+      parts.each do | part |
+        raise "Could not find part '#{part}' in '#{name}'" unless result.has_key? part
+        result = result[part]
+      end
+      result
     end
 
     def group_per_commandclass updates

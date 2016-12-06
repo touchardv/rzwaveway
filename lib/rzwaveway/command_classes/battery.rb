@@ -1,13 +1,13 @@
 module RZWaveWay
   module CommandClasses
-    class Battery
-      include CommandClass
+    class Battery < CommandClass
 
-      def initialize(data, device)
-        @device = device
-        @device.add_property(name: :battery_level,
-                             value: find('data.last.value', data),
-                             update_time: find('data.last.updateTime', data))
+      def property_mappings
+        {
+          battery_level: {
+            key: 'data.last'
+          }
+        }
       end
 
       def process(updates)
