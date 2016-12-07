@@ -5,7 +5,8 @@ module RZWaveWay
       def property_mappings
         {
           level: {
-            key: 'data.level'
+            key: 'data.level',
+            read_only: false
           }
         }
       end
