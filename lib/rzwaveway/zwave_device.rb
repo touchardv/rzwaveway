@@ -115,13 +115,8 @@ module RZWaveWay
 
     def initialize_from data
       @name = find('data.givenName.value', data)
-      last_contact_times = [
-        find('data.lastReceived.updateTime', data),
-        find('data.lastSend.updateTime', data)
-      ]
-      @last_contact_time = last_contact_times.max
-
-      @dead = false
+      @last_contact_time = find('data.lastReceived.updateTime', data)
+      @dead = find('data.isFailed.value', data)
       @missed_contact_count = 0
       @contact_frequency = 0
       @properties = {}
@@ -157,13 +152,10 @@ module RZWaveWay
     end
 
     def process_device_data(updates, events)
-      times = []
+      time = 0
       updates.each do | key, value |
-        if key == 'data.lastReceived' || key == 'data.lastSend'
-          times << value['updateTime']
-        end
+        time = value['updateTime'] if key == 'data.lastReceived'
       end
-      time = times.max
       events << AliveEvent.new(device_id: @id, time: time) if notify_contacted(time)
     end
   end
