@@ -14,6 +14,7 @@ module RZWaveWay
 
       def process(updates)
         log.info updates
+        nil
       end
     end
   end

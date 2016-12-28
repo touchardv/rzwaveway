@@ -1,5 +1,7 @@
 module RZWaveWay
   class CommandClass
+    include Logger
+
     BASIC = 32
     SWITCH_BINARY = 37
     SWITCH_MULTI_LEVEL = 38
