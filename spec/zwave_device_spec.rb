@@ -15,6 +15,7 @@ module RZWaveWay
                                           }
                                           }))
     end
+    let(:ac_powered_device) { ZWaveDevice.new(create_id, create_device_data({}, 1390252000)) }
 
     describe '#new' do
       it 'sets last contact time from data (wake up command class)' do
@@ -35,7 +36,6 @@ module RZWaveWay
       end
 
       it 'sets the last contact time from data (device data)' do
-        ac_powered_device = ZWaveDevice.new(create_id, create_device_data({}, 1390252000))
         expect(ac_powered_device.last_contact_time).to eq 1390252000
       end
 
@@ -134,32 +134,6 @@ module RZWaveWay
         expect(device.last_contact_time).to eq 1409490977
       end
 
-      it 'generates an AliveEvent when last contact time got updated' do
-        device.notify_contacted(now)
-        updates = {
-          'data.lastReceived' => {
-            'name' => 'lastReceived',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => now+100
-          },
-          'data.lastSend' => {
-            'name' => 'lastSend',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => now+100
-          }
-        }
-        events = device.process(updates)
-        expect(events.size).to eq 1
-        event = events.first
-        expect(event.class).to be AliveEvent
-        expect(event.device_id).to eq device.id
-        expect(event.time).to eq (now+100)
-      end
-
       it 'does not generate an AliveEvent when last contact time is not updated' do
         device.notify_contacted(now)
         updates = {
@@ -183,39 +157,22 @@ module RZWaveWay
       end
     end
 
-    describe '#process_alive_check' do
-      it 'generates no event' do
-        device.notify_contacted(now)
-        event = device.process_alive_check
-        expect(event).to be_nil
+    describe '#update_status' do
+      it 'updates the status to :alive' do
+        device.send(:update_status, device.last_contact_time + 60)
+        expect(device.status_changed?).to eq true
+        expect(device.status).to eq :alive
       end
 
-      it 'generates a NotAliveEvent' do
-        device.notify_contacted(now - 600)
-        event = device.process_alive_check
-        expect(event.class).to be NotAliveEvent
-        expect(event.device_id).to eq device.id
+      it 'updates the status to :not_alive' do
+        device.send(:update_status, device.last_contact_time + 600)
+        expect(device.status_changed?).to eq true
+        expect(device.status).to eq :not_alive
       end
 
-      it 'does not generate a NotAliveEvent at each check' do
-        device.notify_contacted(now - 600)
-        event = device.process_alive_check
-        event = device.process_alive_check
-        expect(event).to be_nil
-      end
-
-      it 'generates a DeadEvent' do
-        device.notify_contacted(now - 6000)
-        event = device.process_alive_check
-        expect(event.class).to be DeadEvent
-        expect(event.device_id).to eq device.id
-      end
-
-      it 'does not generate a DeadEvent multiple times' do
-        device.notify_contacted(now - 6000)
-        event = device.process_alive_check
-        event = device.process_alive_check
-        expect(event).to be_nil
+      it 'does not change the status' do
+        device.send(:update_status, device.last_contact_time + 6000)
+        expect(device.status_changed?).to eq false
       end
     end
 

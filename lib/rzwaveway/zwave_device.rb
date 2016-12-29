@@ -9,10 +9,13 @@ module RZWaveWay
     attr_reader :id
     attr_reader :last_contact_time
     attr_accessor :contact_frequency
+    attr_reader :status
 
     def initialize(id, data)
       @id = id
       initialize_from data
+      update_status
+      save
       log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
     end
 
@@ -39,31 +42,13 @@ module RZWaveWay
           log.warn "Could not find command class: '#{cc}'"
         end
       end
-      process_device_data(updates, events)
+      process_device_data(updates)
+      update_status
       events
-    end
-
-    def process_alive_check
-      return if @dead
-      if @contact_frequency > 0
-        current_time = Time.now.to_i
-        delta = current_time - next_contact_time
-        if delta > 0
-          count = ((current_time - @last_contact_time) / @contact_frequency).to_i
-          if count > MAXIMUM_MISSED_CONTACT
-            @dead = true
-            DeadEvent.new(device_id: @id)
-          elsif count > @missed_contact_count
-            @missed_contact_count = count
-            NotAliveEvent.new(device_id: @id, time_delay: delta, missed_count: count)
-          end
-        end
-      end
     end
 
     def notify_contacted(time)
       if time.to_i > @last_contact_time
-        @dead = false
         @last_contact_time = time.to_i
         @missed_contact_count = 0
         true
@@ -84,6 +69,14 @@ module RZWaveWay
 
     def properties
       @properties.values.reject { |property| property[:internal] }
+    end
+
+    def save
+      @previous_status = @status
+    end
+
+    def status_changed?
+      @previous_status != @status
     end
 
     def update_property(name, value, update_time)
@@ -116,11 +109,12 @@ module RZWaveWay
     def initialize_from data
       @name = find('data.givenName.value', data)
       @last_contact_time = find('data.lastReceived.updateTime', data)
-      @dead = find('data.isFailed.value', data)
       @missed_contact_count = 0
       @contact_frequency = 0
       @properties = {}
+      @previous_status = @status = :dead
       @command_classes = create_commandclasses_from data
+      process_device_data(data['data'])
     end
 
     def find(name, data)
@@ -151,12 +145,39 @@ module RZWaveWay
       updates_per_commandclass
     end
 
-    def process_device_data(updates, events)
-      time = 0
-      updates.each do | key, value |
-        time = value['updateTime'] if key == 'data.lastReceived'
+    def process_device_data(data)
+      data.each do | key, value |
+        case key
+        when /^(?:data.)?isFailed/
+          @is_failed = value['value']
+        when /^(?:data.)?lastReceived/
+          notify_contacted(value['updateTime'])
+        end
       end
-      events << AliveEvent.new(device_id: @id, time: time) if notify_contacted(time)
+    end
+
+    def update_status(time = Time.now)
+      time = time.to_i
+      @previous_status = @status
+
+      if contacts_controller_periodically?
+        delta = time - next_contact_time
+        if delta > 0
+          count = ((time - @last_contact_time) / @contact_frequency).to_i
+          if count > MAXIMUM_MISSED_CONTACT
+            @status = :dead
+          elsif count > @missed_contact_count
+            @missed_contact_count = count
+            @status = :not_alive
+          elsif count == 0
+            @status = :alive
+          end
+        else
+          @status = :alive
+        end
+      else
+        @status = @is_failed ? :dead : :alive
+      end
     end
   end
 end

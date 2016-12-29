@@ -60,10 +60,9 @@ module RZWaveWay
     end
 
     def process_events
-      check_devices
       updates = get_zway_data_tree_updates
       events = devices_process updates
-      check_not_alive_devices(events)
+      check_devices_status_changes(events)
       deliver_to_handlers(events)
     end
 
@@ -72,30 +71,27 @@ module RZWaveWay
     DATA_TREE_BASE_PATH='/ZWaveAPI/Data/'
     RUN_BASE_PATH='/ZWaveAPI/Run/'
 
-    def check_devices
-      @devices.values.each do |device|
-        unless device.contacts_controller_periodically?
-          current_time = Time.now.to_i
-          # TODO ensure last_contact_time is set in the device initializer
-          if (current_time % 10 == 0) && (current_time > device.next_contact_time - 60)
-            run_zway_no_operation device.id
-          end
-        end
-      end
-    end
-
-    def check_not_alive_devices(events)
-      @devices.values.each do |device|
-        event = device.process_alive_check
-        events << event if event
-      end
-    end
-
     def create_device(device_id, device_data_tree)
       if device_id > 1
-        device = ZWaveDevice.new(device_id, device_data_tree)
-        device.contact_frequency = 300 unless device.contacts_controller_periodically?
-        @devices[device_id] = device
+        @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree)
+      end
+    end
+
+    def check_devices_status_changes(events)
+      @devices.each do |device_id, device|
+        if device.status_changed?
+          events << case device.status
+          when :alive
+            AliveEvent.new(device_id: device_id, time: device.last_contact_time)
+          when :not_alive
+            NotAliveEvent.new(device_id: device_id)
+          when :dead
+            DeadEvent.new(device_id: device_id)
+          else
+            raise "Unknown device status: #{device.status}"
+          end
+        end
+        device.save
       end
     end
 
