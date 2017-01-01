@@ -33,9 +33,14 @@ module RZWaveWay
     def setup(options, *adapter_params)
       hostname = options[:hostname] || '127.0.0.1'
       port = options[:port] || 8083
+      username = options[:username] || 'admin'
+      password = options[:password] || 'changeme'
       adapter_params = :httpclient if adapter_params.compact.empty?
       @base_uri="http://#{hostname}:#{port}"
-      @connection = Faraday.new {|faraday| faraday.adapter *adapter_params}
+      @connection = Faraday.new do |connection|
+        connection.basic_auth username, password
+        connection.adapter *adapter_params
+      end
       @log = options[:logger] if options.has_key? :logger
     end
 
