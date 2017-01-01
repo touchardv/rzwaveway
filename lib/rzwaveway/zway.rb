@@ -148,7 +148,7 @@ module RZWaveWay
           results = JSON.parse response.body
           @update_time = results.delete('updateTime')
         else
-          log.error(response.reason)
+          log.error("#{response.status} - #{response.reason_phrase}" )
         end
       rescue StandardError => e
         log.error("Failed to communicate with ZWay HTTP server: #{e}")
