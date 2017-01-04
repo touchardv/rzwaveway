@@ -5,8 +5,8 @@ module RZWaveWay
       def initialize(data, device)
         super
 
-        @device.contact_frequency = find('data.interval.value', data)
-        @device.notify_contacted(find('data.lastWakeup.value', data))
+        device.contact_frequency = find('data.interval.value', data)
+        device.notify_contacted(find('data.lastWakeup.value', data))
       end
 
       def property_mappings
@@ -31,9 +31,9 @@ module RZWaveWay
           data = updates['data.lastWakeup']
           value = data['value']
           updateTime = data['updateTime']
-          if @device.update_property(:wakeup_last_wakeup_time, value, updateTime)
-            @device.notify_contacted(value)
-            return AliveEvent.new(device_id: @device.id, time: value)
+          if device.update_property(:wakeup_last_wakeup_time, value, updateTime)
+            device.notify_contacted(value)
+            return AliveEvent.new(device_id: device.id, time: value)
           end
         end
 

@@ -41,7 +41,7 @@ module RZWaveWay
       SIREN = 66
 
       def set level
-        @device.SwitchMultiLevel.set level
+        @device.SwitchMultiLevel.level = level
       end
     end
   end

@@ -15,18 +15,18 @@ module RZWaveWay
           data = updates['data.1']['level']
           value = data['value']
           updateTime = data['updateTime']
-          if @device.update_property(:level, value, updateTime)
-            return LevelEvent.new(device_id: @device.id, time: updateTime, level: value)
+          if device.update_property(:level, value, updateTime)
+            return LevelEvent.new(device_id: device.id, time: updateTime, level: value)
           end
         end
       end
 
       def level
-        @device.get_property(:level)[0]
+        device.get_property(:level)[0]
       end
 
-      def get
-        RZWaveWay::ZWay.instance.execute(@device.id, SENSOR_BINARY, :Get)
+      def refresh
+        RZWaveWay::ZWay.instance.execute(device.id, SENSOR_BINARY, :Get)
       end
     end
   end

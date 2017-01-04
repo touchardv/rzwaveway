@@ -40,6 +40,6 @@ or
 
 ```
 switch = z_way.devices[4]
-switch.SwitchBinary.set(1)
-switch.SwitchBinary.set(0)
+switch.SwitchBinary.level = 1
+switch.SwitchBinary.level = 0
 ```

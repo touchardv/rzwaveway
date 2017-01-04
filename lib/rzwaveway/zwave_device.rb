@@ -71,6 +71,12 @@ module RZWaveWay
       @properties.values.reject { |property| property[:internal] }
     end
 
+    def refresh
+      @command_classes.values.each do |command_class|
+        command_class.refresh if command_class.respond_to? :refresh
+      end
+    end
+
     def save
       @previous_status = @status
     end
