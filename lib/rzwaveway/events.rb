@@ -11,17 +11,17 @@ module RZWaveWay
     end
   end
 
-  class AlarmEvent < OpenStruct ; end
+  class AlarmEvent < Event ; end
 
-  class AliveEvent < OpenStruct ; end
+  class AliveEvent < Event ; end
 
-  class NotAliveEvent < OpenStruct ; end
+  class NotAliveEvent < Event ; end
 
-  class DeadEvent < OpenStruct ; end
+  class DeadEvent < Event ; end
 
-  class LevelEvent < OpenStruct ; end
+  class LevelEvent < Event ; end
 
   class MultiLevelEvent < LevelEvent ; end
 
-  class BatteryValueEvent < OpenStruct ; end
+  class BatteryValueEvent < Event ; end
 end

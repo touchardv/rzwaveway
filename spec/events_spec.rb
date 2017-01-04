@@ -8,17 +8,17 @@ module RZWaveWay
         .to raise_error ArgumentError
       end
 
-      it 'requires a time' do
+      it 'requires a device id' do
         expect { Event.new(foo: 'bar') }
         .to raise_error ArgumentError
       end
 
       it 'adds a time if none is provided' do
-        event = Event.new(device_id: 123)
+        event = DeadEvent.new(device_id: 123)
         expect(event[:time]).not_to be_nil
       end
 
-      it 'keeos the existing time if provided' do
+      it 'keeps the existing time if provided' do
         event = Event.new(device_id: 123, time: 1472373723)
         expect(event[:time]).to eq 1472373723
       end
