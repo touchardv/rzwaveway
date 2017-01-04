@@ -34,11 +34,6 @@ module RZWaveWay
         end
       end
 
-      def level!
-        @device.SwitchMultiLevel.get
-        nil
-      end
-
       private
 
       DISABLED = 0
