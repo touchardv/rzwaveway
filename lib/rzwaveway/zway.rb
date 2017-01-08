@@ -67,7 +67,6 @@ module RZWaveWay
     def process_events
       updates = get_zway_data_tree_updates
       events = devices_process updates
-      check_devices_status_changes(events)
       deliver_to_handlers(events)
     end
 
@@ -79,24 +78,6 @@ module RZWaveWay
     def create_device(device_id, device_data_tree)
       if device_id > 1
         @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree)
-      end
-    end
-
-    def check_devices_status_changes(events)
-      @devices.each do |device_id, device|
-        if device.status_changed?
-          events << case device.status
-          when :alive
-            AliveEvent.new(device_id: device_id, time: device.last_contact_time)
-          when :not_alive
-            NotAliveEvent.new(device_id: device_id)
-          when :dead
-            DeadEvent.new(device_id: device_id)
-          else
-            raise "Unknown device status: #{device.status}"
-          end
-        end
-        device.save
       end
     end
 

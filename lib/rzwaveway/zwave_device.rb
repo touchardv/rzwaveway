@@ -9,22 +9,18 @@ module RZWaveWay
     attr_reader :id
     attr_reader :last_contact_time
     attr_accessor :contact_frequency
-    attr_reader :status
 
     def initialize(id, data)
       @id = id
+      @contact_frequency = 0
+      @last_contact_time = 0
+      @properties = {}
       initialize_from data
-      update_status
-      save
       log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
     end
 
     def contacts_controller_periodically?
       support_commandclass? CommandClass::WAKEUP
-    end
-
-    def next_contact_time
-      @last_contact_time + (@contact_frequency * (1 + @missed_contact_count) * 1.1)
     end
 
     def support_commandclass?(command_class_id)
@@ -43,14 +39,12 @@ module RZWaveWay
         end
       end
       process_device_data(updates)
-      update_status
       events
     end
 
     def notify_contacted(time)
       if time.to_i > @last_contact_time
         @last_contact_time = time.to_i
-        @missed_contact_count = 0
         true
       end
     end
@@ -75,14 +69,6 @@ module RZWaveWay
       @command_classes.values.each do |command_class|
         command_class.refresh if command_class.respond_to? :refresh
       end
-    end
-
-    def save
-      @previous_status = @status
-    end
-
-    def status_changed?
-      @previous_status != @status
     end
 
     def update_property(name, value, update_time)
@@ -115,10 +101,6 @@ module RZWaveWay
     def initialize_from data
       @name = find('data.givenName.value', data)
       @last_contact_time = find('data.lastReceived.updateTime', data)
-      @missed_contact_count = 0
-      @contact_frequency = 0
-      @properties = {}
-      @previous_status = @status = :dead
       @command_classes = create_commandclasses_from data
       process_device_data(data['data'])
     end
@@ -159,30 +141,6 @@ module RZWaveWay
         when /^(?:data.)?lastReceived/
           notify_contacted(value['updateTime'])
         end
-      end
-    end
-
-    def update_status(time = Time.now)
-      time = time.to_i
-      @previous_status = @status
-
-      if contacts_controller_periodically?
-        delta = time - next_contact_time
-        if delta > 0
-          count = ((time - @last_contact_time) / @contact_frequency).to_i
-          if count > MAXIMUM_MISSED_CONTACT
-            @status = :dead
-          elsif count > @missed_contact_count
-            @missed_contact_count = count
-            @status = :not_alive
-          elsif count == 0
-            @status = :alive
-          end
-        else
-          @status = :alive
-        end
-      else
-        @status = @is_failed ? :dead : :alive
       end
     end
   end

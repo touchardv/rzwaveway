@@ -157,25 +157,6 @@ module RZWaveWay
       end
     end
 
-    describe '#update_status' do
-      it 'updates the status to :alive' do
-        device.send(:update_status, device.last_contact_time + 60)
-        expect(device.status_changed?).to eq true
-        expect(device.status).to eq :alive
-      end
-
-      it 'updates the status to :not_alive' do
-        device.send(:update_status, device.last_contact_time + 600)
-        expect(device.status_changed?).to eq true
-        expect(device.status).to eq :not_alive
-      end
-
-      it 'does not change the status' do
-        device.send(:update_status, device.last_contact_time + 6000)
-        expect(device.status_changed?).to eq false
-      end
-    end
-
     describe '#to_json' do
       it 'returns json' do
         json = device.to_json
