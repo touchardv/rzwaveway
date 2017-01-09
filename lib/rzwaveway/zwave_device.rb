@@ -61,13 +61,6 @@ module RZWaveWay
       end
     end
 
-    def update_property(name, value, update_time)
-      if @properties.has_key?(name)
-        property = @properties[name]
-        property.update(value, update_time)
-      end
-    end
-
     private
 
     MAXIMUM_MISSED_CONTACT = 10
