@@ -9,6 +9,7 @@ module RZWaveWay
     attr_reader :id
     attr_reader :last_contact_time
     attr_accessor :contact_frequency
+    attr_reader :properties
 
     def initialize(id, data)
       @id = id
@@ -49,20 +50,9 @@ module RZWaveWay
       end
     end
 
-    def add_property(property)
-      property[:read_only] = true unless property.has_key? :read_only
-      @properties[property[:name]] = property
-    end
-
-    def get_property(name)
-      [
-        @properties[name][:value],
-        @properties[name][:update_time]
-      ]
-    end
-
-    def properties
-      @properties.values.reject { |property| property[:internal] }
+    def add_property(name, property)
+      self.class.send(:define_method, name) { property }
+      @properties[name] = property
     end
 
     def refresh
@@ -74,11 +64,7 @@ module RZWaveWay
     def update_property(name, value, update_time)
       if @properties.has_key?(name)
         property = @properties[name]
-        if property[:value] != value || property[:update_time] < update_time
-          property[:value] = value
-          property[:update_time] = update_time
-          true
-        end
+        property.update(value, update_time)
       end
     end
 

@@ -22,14 +22,13 @@ module RZWaveWay
     def initialize(data, device)
       @device = device
       property_mappings.each_pair do |property_name, options|
-        property = {
-          name: property_name,
+        options = {
           value: find("#{options[:key]}.value", data),
           update_time: find("#{options[:key]}.updateTime", data),
           read_only: (options.has_key?(:read_only) ? options[:read_only] : true)
         }
-        property[:internal] = true if options[:internal]
-        device.add_property(property)
+        property = Property.new(options)
+        device.add_property(property_name, property)
       end
     end
 

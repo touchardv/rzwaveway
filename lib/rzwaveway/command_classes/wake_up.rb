@@ -15,11 +15,11 @@ module RZWaveWay
             key: 'data.interval',
             internal: true
           },
-          wakeup_last_sleep_time: {
+          last_sleep_time: {
             key: 'data.lastSleep',
             internal: true
           },
-          wakeup_last_wakeup_time: {
+          last_wakeup_time: {
             key: 'data.lastWakeup',
             internal: true
           }
@@ -30,8 +30,8 @@ module RZWaveWay
         if updates.keys.include?('data.lastWakeup')
           data = updates['data.lastWakeup']
           value = data['value']
-          updateTime = data['updateTime']
-          if device.update_property(:wakeup_last_wakeup_time, value, updateTime)
+          update_time = data['updateTime']
+          if device.last_wakeup_time.update(value, update_time)
             device.notify_contacted(value)
             return AliveEvent.new(device_id: device.id, time: value)
           end

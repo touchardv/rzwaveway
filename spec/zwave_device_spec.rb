@@ -45,28 +45,18 @@ module RZWaveWay
     end
 
     describe '#add_property' do
+      let(:property1) { Property.new(value: 123, update_time: Time.now.to_i, read_only: true) }
+
       it 'stores a property' do
-        property = { name: 'prop1', value: 123, update_time: Time.now.to_i, read_only: true }
-        device.add_property(property)
+        device.add_property('prop1', property1)
 
-        expect(device.get_property('prop1')).not_to be_nil
-      end
-    end
-
-    describe '#properties' do
-      it 'returns the name and value of all properties' do
-        device.add_property({ name: 'prop1', value: 123, update_time: 1390252000 })
-        device.add_property({ name: 'prop2', value: 456, update_time: 1390252000 })
-
-        expect(device.properties).to eq([
-                                          {name: 'prop1', value: 123, update_time: 1390252000, read_only: true},
-                                          {name: 'prop2', value: 456, update_time: 1390252000, read_only: true}
-        ])
+        expect(device.properties['prop1']).not_to be_nil
       end
 
-      it 'does not include internal properties' do
-        device.add_property({ name: 'prop1', value: 123, update_time: 1390252000, internal: true })
-        expect(device.properties).to be_empty
+      it 'creates a method for accessing the property' do
+        device.add_property('prop1', property1)
+
+        expect(device.prop1.value).to eq 123
       end
     end
 

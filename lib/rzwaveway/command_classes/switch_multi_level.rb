@@ -15,15 +15,15 @@ module RZWaveWay
         if updates.keys.include?('data.level')
           data = updates['data.level']
           value = data['value']
-          updateTime = data['updateTime']
-          if device.update_property(:level, value, updateTime)
-            return MultiLevelEvent.new(device_id: device.id, time: updateTime, level: value)
+          update_time = data['updateTime']
+          if device.level.update(value, update_time)
+            return MultiLevelEvent.new(device_id: device.id, time: update_time, level: value)
           end
         end
       end
 
       def level
-        device.get_property(:level)[0]
+        device.properties[:level].value
       end
 
       def level=(value)

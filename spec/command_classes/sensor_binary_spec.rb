@@ -13,9 +13,10 @@ module RZWaveWay
       end
 
       describe '#new' do
-        it 'stores interesting properties' do
+        it 'adds a property for level' do
           command_class
-          expect(device.get_property(:level)).to eq [false, 1405102560]
+          expect(device.properties[:level].value).to eq false
+          expect(device.properties[:level].update_time).to eq 1405102560
         end
       end
 
