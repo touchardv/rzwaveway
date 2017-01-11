@@ -44,6 +44,23 @@ module RZWaveWay
         expect(property.update_time).to eq 10
       end
 
+      it 'updates the update time' do
+        property.update(123, 10)
+        expect(property.update_time).to eq 10
+      end
+
+      it 'does not update with a past value' do
+        property.update(0, -10)
+        expect(property.value).to eq 123
+        expect(property.update_time).to eq 0
+      end
+
+      it 'does not update the value and time' do
+        property.update(123, 0)
+        expect(property.value).to eq 123
+        expect(property.update_time).to eq 0
+      end
+
       it 'returns true when the value is changed' do
         result = property.update(456, 10)
         expect(result).to eq true

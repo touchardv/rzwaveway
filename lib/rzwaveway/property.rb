@@ -23,10 +23,14 @@ module RZWaveWay
     end
 
     def update(value, update_time)
-      if @value != value
-        @value = value
+      if @update_time <= update_time
         @update_time = update_time
-        true
+        if @value != value
+          @value = value
+          true
+        else
+          false
+        end
       else
         false
       end
