@@ -31,7 +31,7 @@ module RZWaveWay
 
     describe '#save' do
       it '"applies/persists" the value update' do
-        property.update(456, update_time: 10)
+        property.update(456, 10)
         property.save
         expect(property.changed?).to eq false
       end
