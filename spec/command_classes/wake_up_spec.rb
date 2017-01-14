@@ -22,7 +22,7 @@ module RZWaveWay
 
         it 'updates the contact frequency' do
           command_class
-          expect(device.contact_frequency).to eq 300
+          expect(device.contact_frequency.value).to eq 300
         end
 
         it 'adds a property for last sleep/wakeup time' do

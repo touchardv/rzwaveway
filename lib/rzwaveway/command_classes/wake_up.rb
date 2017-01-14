@@ -5,7 +5,8 @@ module RZWaveWay
       def initialize(data, device)
         super
 
-        device.contact_frequency = find('data.interval.value', data)
+        device.contact_frequency.update(find('data.interval.value', data),
+                                        find('data.interval.updateTime', data))
         device.notify_contacted(find('data.lastWakeup.value', data))
       end
 

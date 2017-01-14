@@ -7,14 +7,11 @@ module RZWaveWay
 
     attr_reader :name
     attr_reader :id
-    attr_reader :last_contact_time
-    attr_accessor :contact_frequency
+    attr_reader :contact_frequency
     attr_reader :properties
 
     def initialize(id, data)
       @id = id
-      @contact_frequency = 0
-      @last_contact_time = 0
       @properties = {}
       initialize_from data
       log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
@@ -40,14 +37,18 @@ module RZWaveWay
         end
       end
       process_device_data(updates)
+      if @last_contact_time.changed?
+        events << AliveEvent.new(device_id: @id, time: @last_contact_time.value)
+      end
       events
     end
 
+    def last_contact_time
+      @last_contact_time.value
+    end
+
     def notify_contacted(time)
-      if time.to_i > @last_contact_time
-        @last_contact_time = time.to_i
-        true
-      end
+      @last_contact_time.update(time.to_i, time.to_i)
     end
 
     def add_property(name, property)
@@ -78,9 +79,13 @@ module RZWaveWay
     end
 
     def initialize_from data
+      last_received = find('data.lastReceived.updateTime', data)
+
       @name = find('data.givenName.value', data)
-      @last_contact_time = find('data.lastReceived.updateTime', data)
+      @contact_frequency = Property.new(value: 0, update_time: 0)
+      @last_contact_time = Property.new(value: last_received, update_time: last_received)
       @command_classes = create_commandclasses_from data
+
       process_device_data(data['data'])
     end
 
@@ -109,6 +114,7 @@ module RZWaveWay
       end
       updates.clear
       updates.merge!(other_updates)
+      # TODO check other_updates content?
       updates_per_commandclass
     end
 

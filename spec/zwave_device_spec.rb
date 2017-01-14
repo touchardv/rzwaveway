@@ -2,7 +2,6 @@ require 'spec_helper'
 
 module RZWaveWay
   describe ZWaveDevice do
-    let(:now) { Time.now }
     let(:device) do
       ZWaveDevice.new(create_id,
                       create_device_data({CommandClass::WAKEUP =>
@@ -124,26 +123,21 @@ module RZWaveWay
         expect(device.last_contact_time).to eq 1409490977
       end
 
-      it 'does not generate an AliveEvent when last contact time is not updated' do
-        device.notify_contacted(now)
+      it 'generates an AliveEvent when last contact time was updated' do
+        now = Time.now.to_i
         updates = {
           'data.lastReceived' => {
             'name' => 'lastReceived',
-            'value' => 176428709,
+            'value' => 0,
             'type' => 'int',
             'invalidateTime' => 1390251561,
-            'updateTime' => 1409490970
-          },
-          'data.lastSend' => {
-            'name' => 'lastSend',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => 1409490970
+            'updateTime' => now
           }
         }
         events = device.process(updates)
-        expect(events.size).to eq 0
+        expect(events.size).to eq 1
+        event = events[0]
+        expect(event.time).to eq now
       end
     end
 
