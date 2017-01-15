@@ -42,15 +42,13 @@ module RZWaveWay
           expect(command_class.process({})).to be_nil
         end
 
-        it 'returns an alive event' do
+        it 'updates the last contact time' do
           updates = {
             'data.lastWakeup' => {'value' => 1395247772, 'updateTime' => 1395247772},
             'data.lastSleep' => {'value' => 1395247772, 'updateTime' => 1395247772}
           }
           event = command_class.process(updates)
-          expect(event.class).to be RZWaveWay::AliveEvent
-          expect(event.device_id).to eq device.id
-          expect(event.time).to eq 1395247772
+          expect(device.last_contact_time).to eq 1395247772
         end
       end
     end

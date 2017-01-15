@@ -34,7 +34,6 @@ module RZWaveWay
           update_time = data['updateTime']
           if device.last_wakeup_time.update(value, update_time)
             device.notify_contacted(value)
-            return AliveEvent.new(device_id: device.id, time: value)
           end
         end
 
