@@ -40,6 +40,7 @@ module RZWaveWay
       if @last_contact_time.changed?
         events << AliveEvent.new(device_id: @id, time: @last_contact_time.value)
       end
+      save_changes
       events
     end
 
@@ -60,6 +61,11 @@ module RZWaveWay
       @command_classes.values.each do |command_class|
         command_class.refresh if command_class.respond_to? :refresh
       end
+    end
+
+    def save_changes
+      @contact_frequency.save
+      @last_contact_time.save
     end
 
     private
