@@ -102,27 +102,6 @@ module RZWaveWay
         expect(device.last_contact_time).to eq 1409490977
       end
 
-      it 'updates the last contact time' do
-        updates = {
-          'data.lastReceived' => {
-            'name' => 'lastReceived',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => 1409490977
-          },
-          'data.lastSend' => {
-            'name' => 'lastSend',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => 1409490970
-          }
-        }
-        device.process(updates)
-        expect(device.last_contact_time).to eq 1409490977
-      end
-
       it 'generates an AliveEvent when last contact time was updated' do
         now = Time.now.to_i
         updates = {
