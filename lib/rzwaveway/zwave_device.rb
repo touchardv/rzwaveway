@@ -64,6 +64,7 @@ module RZWaveWay
     end
 
     def save_changes
+      @properties.values.each {|property| property.save}
       @contact_frequency.save
       @last_contact_time.save
     end
