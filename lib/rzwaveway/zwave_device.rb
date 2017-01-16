@@ -8,7 +8,6 @@ module RZWaveWay
     attr_reader :name
     attr_reader :id
     attr_reader :contact_frequency
-    attr_reader :properties
 
     def initialize(id, data)
       @id = id
@@ -55,6 +54,12 @@ module RZWaveWay
     def add_property(name, property)
       self.class.send(:define_method, name) { property }
       @properties[name] = property
+    end
+
+    def properties
+      @properties.each_with_object({}) do |property, values|
+        values[property[0]] = property[1].value
+      end
     end
 
     def refresh

@@ -16,8 +16,8 @@ module RZWaveWay
       describe '#new' do
         it 'adds the battery level property' do
           command_class
-          expect(device.properties[:battery_level].value).to eq 60
-          expect(device.properties[:battery_level].update_time).to eq 1409681662
+          expect(device.battery_level.value).to eq 60
+          expect(device.battery_level.update_time).to eq 1409681662
         end
       end
 

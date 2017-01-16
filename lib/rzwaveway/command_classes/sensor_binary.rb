@@ -22,7 +22,7 @@ module RZWaveWay
       end
 
       def level
-        device.properties[:level].value
+        device.level.value
       end
 
       def refresh

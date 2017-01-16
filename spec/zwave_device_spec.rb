@@ -120,6 +120,12 @@ module RZWaveWay
       end
     end
 
+    describe '#properties' do
+      it 'returns a Hash' do
+        expect(device.properties.class).to eq Hash
+      end
+    end
+
     describe '#to_json' do
       it 'returns json' do
         json = device.to_json
