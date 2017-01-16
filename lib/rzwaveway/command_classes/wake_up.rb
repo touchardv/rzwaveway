@@ -36,7 +36,7 @@ module RZWaveWay
             device.notify_contacted(value)
           end
         end
-
+        nil
         # TODO handle change of wake up interval value?
       end
     end
