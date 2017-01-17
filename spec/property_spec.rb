@@ -37,6 +37,14 @@ module RZWaveWay
       end
     end
 
+    describe '#to_hash' do
+      it 'returns a hash with value, update time and read-only' do
+        hash = property.to_hash
+        expect(hash.class).to eq Hash
+        expect(hash.keys).to include(:value, :read_only, :update_time)
+      end
+    end
+
     describe '#update' do
       it 'updates the value and update time' do
         property.update(456, 10)

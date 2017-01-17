@@ -22,6 +22,14 @@ module RZWaveWay
       @previous_update_time = @update_time
     end
 
+    def to_hash
+      {
+        read_only: read_only?,
+        value: @value,
+        update_time: @update_time
+      }
+    end
+
     def update(value, update_time)
       if @update_time <= update_time
         @update_time = update_time

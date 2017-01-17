@@ -58,7 +58,7 @@ module RZWaveWay
 
     def properties
       @properties.each_with_object({}) do |property, values|
-        values[property[0]] = property[1].value
+        values[property[0]] = property[1].to_hash
       end
     end
 
