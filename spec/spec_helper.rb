@@ -14,7 +14,8 @@ module SpecHelpers
           'value' => 'device name'
           },
         'isFailed' => {
-          'value' => false
+          'value' => false,
+          'updateTime' => 0
         },
         'lastReceived' => {
           'updateTime' => last_contact_time

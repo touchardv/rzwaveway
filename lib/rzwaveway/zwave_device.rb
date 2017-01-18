@@ -43,6 +43,10 @@ module RZWaveWay
       events
     end
 
+    def contact_failure?
+      @is_failed.value
+    end
+
     def last_contact_time
       @last_contact_time.value
     end
@@ -71,6 +75,7 @@ module RZWaveWay
     def save_changes
       @properties.values.each {|property| property.save}
       @contact_frequency.save
+      @is_failed.save
       @last_contact_time.save
     end
 
@@ -95,6 +100,7 @@ module RZWaveWay
 
       @name = find('data.givenName.value', data)
       @contact_frequency = Property.new(value: 0, update_time: 0)
+      @is_failed = Property.new(value: false, update_time: 0)
       @last_contact_time = Property.new(value: last_received, update_time: last_received)
       @command_classes = create_commandclasses_from data
 
@@ -118,7 +124,7 @@ module RZWaveWay
         match_data = key.match(/\Ainstances.0.commandClasses.(\d+)./)
         if match_data
           command_class = match_data[1].to_i
-          updates_per_commandclass[command_class] = {} unless updates_per_commandclass.has_key?(command_class)
+          updates_per_commandclass[command_class] ||= {}
           updates_per_commandclass[command_class][match_data.post_match] = value
         else
           other_updates[key] = value
@@ -126,7 +132,6 @@ module RZWaveWay
       end
       updates.clear
       updates.merge!(other_updates)
-      # TODO check other_updates content?
       updates_per_commandclass
     end
 
@@ -134,7 +139,7 @@ module RZWaveWay
       data.each do | key, value |
         case key
         when /^(?:data.)?isFailed/
-          @is_failed = value['value']
+          @is_failed.update(value['value'], value['updateTime'])
         when /^(?:data.)?lastReceived/
           notify_contacted(value['updateTime'])
         end
