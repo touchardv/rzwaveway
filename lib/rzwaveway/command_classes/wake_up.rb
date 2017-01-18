@@ -5,16 +5,13 @@ module RZWaveWay
       def initialize(data, device)
         super
 
-        device.contact_frequency.update(find('data.interval.value', data),
-                                        find('data.interval.updateTime', data))
         device.notify_contacted(find('data.lastWakeup.value', data))
       end
 
       def property_mappings
         {
-          wakeup_interval: {
-            key: 'data.interval',
-            internal: true
+          contact_frequency: {
+            key: 'data.interval'
           },
           last_sleep_time: {
             key: 'data.lastSleep',

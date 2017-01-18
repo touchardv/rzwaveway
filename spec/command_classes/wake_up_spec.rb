@@ -16,13 +16,8 @@ module RZWaveWay
       describe '#new' do
         it 'adds a property for wakeup interval' do
           command_class
-          expect(device.wakeup_interval.value).to eq 300
-          expect(device.wakeup_interval.update_time).to eq 1394983000
-        end
-
-        it 'updates the contact frequency' do
-          command_class
           expect(device.contact_frequency.value).to eq 300
+          expect(device.contact_frequency.update_time).to eq 1394983000
         end
 
         it 'adds a property for last sleep/wakeup time' do

@@ -7,7 +7,6 @@ module RZWaveWay
 
     attr_reader :name
     attr_reader :id
-    attr_reader :contact_frequency
 
     def initialize(id, data)
       @id = id
@@ -74,7 +73,6 @@ module RZWaveWay
 
     def save_changes
       @properties.values.each {|property| property.save}
-      @contact_frequency.save
       @is_failed.save
       @last_contact_time.save
     end
@@ -99,7 +97,6 @@ module RZWaveWay
       last_received = find('data.lastReceived.updateTime', data)
 
       @name = find('data.givenName.value', data)
-      @contact_frequency = Property.new(value: 0, update_time: 0)
       @is_failed = Property.new(value: false, update_time: 0)
       @last_contact_time = Property.new(value: last_received, update_time: last_received)
       @command_classes = create_commandclasses_from data
