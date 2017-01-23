@@ -2,12 +2,8 @@ module RZWaveWay
   module CommandClasses
     class Battery < CommandClass
 
-      def property_mappings
-        {
-          battery_level: {
-            key: 'data.last'
-          }
-        }
+      def build_from(data)
+        define_property(:battery_level, 'data.last', true, data)
       end
 
       def process(updates)
@@ -15,7 +11,7 @@ module RZWaveWay
           data = updates['data.last']
           value = data['value']
           update_time = data['updateTime']
-          if device.battery_level.update(value, update_time)
+          if @properties[:battery_level].update(value, update_time)
             return BatteryValueEvent.new(device_id: device.id, time: update_time, value: value)
           end
         end

@@ -19,17 +19,28 @@ module RZWaveWay
 
     attr_reader :device
 
-    def initialize(data, device)
+    def initialize(device)
       @device = device
-      property_mappings.each_pair do |property_name, options|
-        options = {
-          value: find("#{options[:key]}.value", data),
-          update_time: find("#{options[:key]}.updateTime", data),
-          read_only: (options.has_key?(:read_only) ? options[:read_only] : true)
-        }
-        property = Property.new(options)
-        device.add_property(property_name, property)
-      end
+      @properties = {}
+    end
+
+    def build_from(data)
+      nil
+    end
+
+    def define_property(property_name, key, read_only, data)
+      options = {
+        value: find("#{key}.value", data),
+        update_time: find("#{key}.updateTime", data),
+        read_only: read_only
+      }
+      property = Property.new(options)
+      (class << self; self end).send(:define_method, property_name) { property.value }
+      @properties[property_name] = property
+    end
+
+    def to_hash
+      @properties.each_with_object({}) {|property, hash| hash[property[0]] = property[1].to_hash}
     end
 
     private

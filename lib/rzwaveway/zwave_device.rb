@@ -54,15 +54,10 @@ module RZWaveWay
       @last_contact_time.update(time.to_i, time.to_i)
     end
 
-    def add_property(name, property)
-      self.class.send(:define_method, name) { property }
-      @properties[name] = property
-    end
-
-    def properties
-      @properties.each_with_object({}) do |property, values|
-        values[property[0]] = property[1].to_hash
-      end
+    def to_hash
+      hash = {}
+      @properties.each_with_object(hash) {|property, hash| hash[property[0]] = property[1].to_hash}
+      @command_classes.values.each_with_object(hash) {|cc, hash| hash.merge!(cc.to_hash)}
     end
 
     def refresh
@@ -85,7 +80,8 @@ module RZWaveWay
       cc_classes = {}
       data['instances']['0']['commandClasses'].each do |id, sub_tree|
         cc_id = id.to_i
-        cc_class = CommandClasses::Factory.instance.instantiate(cc_id, sub_tree, self)
+        cc_class = CommandClasses::Factory.instance.instantiate(cc_id, self)
+        cc_class.build_from(sub_tree)
         cc_classes[cc_id] = cc_class
         cc_class_name = cc_class.class.name.split('::').last
         (class << self; self end).send(:define_method, cc_class_name) { cc_class } unless cc_class_name == 'Dummy'

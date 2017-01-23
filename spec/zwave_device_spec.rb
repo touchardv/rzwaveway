@@ -47,22 +47,6 @@ module RZWaveWay
       end
     end
 
-    describe '#add_property' do
-      let(:property1) { Property.new(value: 123, update_time: Time.now.to_i, read_only: true) }
-
-      it 'stores a property' do
-        device.add_property('prop1', property1)
-
-        expect(device.properties['prop1']).not_to be_nil
-      end
-
-      it 'creates a method for accessing the property' do
-        device.add_property('prop1', property1)
-
-        expect(device.prop1.value).to eq 123
-      end
-    end
-
     describe '#contacts_controller_periodically?' do
       it 'returns true if device supports wake up cc' do
         expect(device.contacts_controller_periodically?).to be true
@@ -124,9 +108,9 @@ module RZWaveWay
       end
     end
 
-    describe '#properties' do
+    describe '#to_hash' do
       it 'returns a Hash' do
-        expect(device.properties.class).to eq Hash
+        expect(device.to_hash.class).to eq Hash
       end
     end
 

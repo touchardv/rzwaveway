@@ -2,26 +2,12 @@ module RZWaveWay
   module CommandClasses
     class WakeUp < CommandClass
 
-      def initialize(data, device)
-        super
+      def build_from(data)
+        define_property(:contact_frequency, 'data.interval', true, data)
+        define_property(:last_sleep_time, 'data.lastSleep', true, data)
+        define_property(:last_wakeup_time, 'data.lastWakeup', true, data)
 
         device.notify_contacted(find('data.lastWakeup.value', data))
-      end
-
-      def property_mappings
-        {
-          contact_frequency: {
-            key: 'data.interval'
-          },
-          last_sleep_time: {
-            key: 'data.lastSleep',
-            internal: true
-          },
-          last_wakeup_time: {
-            key: 'data.lastWakeup',
-            internal: true
-          }
-        }
       end
 
       def process(updates)
@@ -29,7 +15,7 @@ module RZWaveWay
           data = updates['data.lastWakeup']
           value = data['value']
           update_time = data['updateTime']
-          if device.last_wakeup_time.update(value, update_time)
+          if @properties[:last_wakeup_time].update(value, update_time)
             device.notify_contacted(value)
           end
         end

@@ -15,10 +15,6 @@ module RZWaveWay
       TYPE_EMERGENCY = 0x0a
       TYPE_CLOCK = 0x0b
 
-      def property_mappings
-        {}
-      end
-
       def process(updates)
         if updates.keys.include?('data.V1event')
           event = updates['data.V1event']

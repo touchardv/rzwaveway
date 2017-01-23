@@ -2,12 +2,8 @@ module RZWaveWay
   module CommandClasses
     class SensorBinary < CommandClass
 
-      def property_mappings
-        {
-          level: {
-            key: 'data.1.level'
-          }
-        }
+      def build_from(data)
+        define_property(:level, 'data.1.level', true, data)
       end
 
       def process(updates)
@@ -15,14 +11,10 @@ module RZWaveWay
           data = updates['data.1']['level']
           value = data['value']
           update_time = data['updateTime']
-          if device.level.update(value, update_time)
+          if @properties[:level].update(value, update_time)
             return LevelEvent.new(device_id: device.id, time: update_time, level: value)
           end
         end
-      end
-
-      def level
-        device.level.value
       end
 
       def refresh

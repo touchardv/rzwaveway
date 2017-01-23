@@ -4,24 +4,25 @@ module RZWaveWay
   module CommandClasses
     describe Battery do
       let(:device) { ZWaveDevice.new(create_id, create_device_data) }
-      let(:command_class) do
-        Battery.new(
-          {'data' => { 'last' => {
-                         'value' => 60,
-                         'type' => 'int',
-                         'updateTime' => 1409681662
-        }}}, device)
-      end
+      let(:command_class) { Battery.new(device) }
+      let(:data) {
+        {'data' => { 'last' => {
+                       'value' => 60,
+                       'type' => 'int',
+                       'updateTime' => 1409681662
+        }}}
+      }
 
-      describe '#new' do
+      describe '#build_from' do
         it 'adds the battery level property' do
-          command_class
-          expect(device.battery_level.value).to eq 60
-          expect(device.battery_level.update_time).to eq 1409681662
+          command_class.build_from(data)
+          expect(command_class.battery_level).to eq 60
         end
       end
 
       describe '#process' do
+        before { command_class.build_from(data) }
+
         it 'does nothing when it processes no updates' do
           expect(command_class.process({})).to be_nil
         end

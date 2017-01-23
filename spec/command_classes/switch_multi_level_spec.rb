@@ -4,23 +4,24 @@ module RZWaveWay
   module CommandClasses
     describe SwitchMultiLevel do
       let(:device) { ZWaveDevice.new(create_id, create_device_data) }
-      let(:command_class) do
-        SwitchMultiLevel.new(
-          {'data' => { 'level' => {
-                         'value' => 33,
-                         'updateTime' => 1405102560
-        }}}, device)
-      end
+      let(:command_class) { SwitchMultiLevel.new(device) }
+      let(:data) {
+        {'data' => { 'level' => {
+                       'value' => 33,
+                       'updateTime' => 1405102560
+        }}}
+      }
 
-      describe '#new' do
+      describe '#build_from' do
         it 'adds a property for level' do
-          command_class
-          expect(device.level.value).to eq 33
-          expect(device.level.update_time).to eq 1405102560
+          command_class.build_from(data)
+          expect(command_class.level).to eq 33
         end
       end
 
       describe '#process' do
+        before { command_class.build_from(data) }
+
         it 'does nothing when it processes no updates' do
           expect(command_class.process({})).to be_nil
         end
