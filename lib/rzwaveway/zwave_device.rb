@@ -1,16 +1,13 @@
-require 'json'
-
 module RZWaveWay
   class ZWaveDevice
     include CommandClasses
     include Logger
+    include PropertiesCache
 
-    attr_reader :name
     attr_reader :id
 
     def initialize(id, data)
       @id = id
-      @properties = {}
       initialize_from data
       log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
     end
@@ -35,28 +32,19 @@ module RZWaveWay
         end
       end
       process_device_data(updates)
-      if @last_contact_time.changed?
-        events << AliveEvent.new(device_id: @id, time: @last_contact_time.value)
+      if properties[:last_contact_time].changed?
+        events << AliveEvent.new(device_id: @id, time: last_contact_time)
       end
       save_changes
       events
     end
 
-    def contact_failure?
-      @is_failed.value
-    end
-
-    def last_contact_time
-      @last_contact_time.value
-    end
-
     def notify_contacted(time)
-      @last_contact_time.update(time.to_i, time.to_i)
+      properties[:last_contact_time].update(time.to_i, time.to_i)
     end
 
-    def to_hash
-      hash = {}
-      @properties.each_with_object(hash) {|property, hash| hash[property[0]] = property[1].to_hash}
+    def state
+      hash = to_hash
       @command_classes.values.each_with_object(hash) {|cc, hash| hash.merge!(cc.to_hash)}
     end
 
@@ -67,9 +55,8 @@ module RZWaveWay
     end
 
     def save_changes
-      @properties.values.each {|property| property.save}
-      @is_failed.save
-      @last_contact_time.save
+      save_properties
+      @command_classes.values.each {|cc| cc.save_properties}
     end
 
     private
@@ -90,24 +77,12 @@ module RZWaveWay
     end
 
     def initialize_from data
-      last_received = find('data.lastReceived.updateTime', data)
+      define_property(:name, 'data.givenName', true, data)
+      define_property(:is_failed, 'data.isFailed', true, data)
+      define_property(:last_contact_time, 'data.lastReceived', true, data)
 
-      @name = find('data.givenName.value', data)
-      @is_failed = Property.new(value: false, update_time: 0)
-      @last_contact_time = Property.new(value: last_received, update_time: last_received)
       @command_classes = create_commandclasses_from data
-
-      process_device_data(data['data'])
-    end
-
-    def find(name, data)
-      parts = name.split '.'
-      result = data
-      parts.each do | part |
-        raise "Could not find part '#{part}' in '#{name}'" unless result.has_key? part
-        result = result[part]
-      end
-      result
+      save_changes
     end
 
     def group_per_commandclass updates
@@ -132,9 +107,10 @@ module RZWaveWay
       data.each do | key, value |
         case key
         when /^(?:data.)?isFailed/
-          @is_failed.update(value['value'], value['updateTime'])
+          properties[:is_failed].update(value['value'], value['updateTime'])
         when /^(?:data.)?lastReceived/
-          notify_contacted(value['updateTime'])
+          last_contact_time = value['updateTime']
+          properties[:last_contact_time].update(last_contact_time, last_contact_time)
         end
       end
     end

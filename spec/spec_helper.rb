@@ -11,13 +11,15 @@ module SpecHelpers
     {
       'data' => {
         'givenName' => {
-          'value' => 'device name'
+          'value' => 'device name',
+          'updateTime' => 0
           },
         'isFailed' => {
           'value' => false,
           'updateTime' => 0
         },
         'lastReceived' => {
+          'value' => 0,
           'updateTime' => last_contact_time
         },
         'lastSend' => {

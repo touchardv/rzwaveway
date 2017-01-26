@@ -35,7 +35,7 @@ module RZWaveWay
       end
 
       it 'sets the is failed flag' do
-        expect(ac_powered_device.contact_failure?).to eq false
+        expect(ac_powered_device.is_failed).to eq false
       end
 
       it 'sets the last contact time from data (device data)' do

@@ -20,6 +20,9 @@ module RZWaveWay
       def process(updates)
       end
 
+      def save_properties
+      end
+
       def to_hash
         {}
       end
