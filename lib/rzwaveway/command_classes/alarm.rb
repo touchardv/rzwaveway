@@ -15,15 +15,11 @@ module RZWaveWay
       TYPE_EMERGENCY = 0x0a
       TYPE_CLOCK = 0x0b
 
-      def property_mappings
-        {}
-      end
-
       def process(updates)
         if updates.keys.include?('data.V1event')
           event = updates['data.V1event']
 
-          AlarmEvent.new(device_id: @device.id,
+          AlarmEvent.new(device_id: device.id,
                          time: event['updateTime'],
                          alarm_type: event['alarmType']['value'],
                          level: event['level']['value'])

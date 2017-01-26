@@ -1,6 +1,7 @@
 module RZWaveWay
   class CommandClass
     include Logger
+    include PropertiesCache
 
     BASIC = 32
     SWITCH_BINARY = 37
@@ -19,30 +20,11 @@ module RZWaveWay
 
     attr_reader :device
 
-    def initialize(data, device)
+    def initialize(device)
       @device = device
-      property_mappings.each_pair do |property_name, options|
-        property = {
-          name: property_name,
-          value: find("#{options[:key]}.value", data),
-          update_time: find("#{options[:key]}.updateTime", data),
-          read_only: (options.has_key?(:read_only) ? options[:read_only] : true)
-        }
-        property[:internal] = true if options[:internal]
-        device.add_property(property)
-      end
     end
 
-    private
-
-    def find(name, data)
-      parts = name.split '.'
-      result = data
-      parts.each do | part |
-        raise "Could not find part '#{part}' in '#{name}'" unless result.has_key? part
-        result = result[part]
-      end
-      result
+    def build_from(data)
     end
   end
 end

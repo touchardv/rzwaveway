@@ -2,28 +2,19 @@ module RZWaveWay
   module CommandClasses
     class SwitchMultiLevel < CommandClass
 
-      def property_mappings
-        {
-          level: {
-            key: 'data.level',
-            read_only: false
-          }
-        }
+      def build_from(data)
+        define_property(:level, 'data.level', false, data)
       end
 
       def process(updates)
         if updates.keys.include?('data.level')
           data = updates['data.level']
           value = data['value']
-          updateTime = data['updateTime']
-          if device.update_property(:level, value, updateTime)
-            return MultiLevelEvent.new(device_id: device.id, time: updateTime, level: value)
+          update_time = data['updateTime']
+          if @properties[:level].update(value, update_time)
+            return MultiLevelEvent.new(device_id: device.id, time: update_time, level: value)
           end
         end
-      end
-
-      def level
-        device.get_property(:level)[0]
       end
 
       def level=(value)

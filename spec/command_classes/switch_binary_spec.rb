@@ -4,22 +4,24 @@ module RZWaveWay
   module CommandClasses
     describe SwitchBinary do
       let(:device) { ZWaveDevice.new(create_id, create_device_data) }
-      let(:command_class) do
-        SwitchBinary.new(
-          {'data' => { 'level' => {
-                         'value' => false,
-                         'updateTime' => 1405102560
-        }}}, device)
-      end
+      let(:command_class) { SwitchBinary.new(device) }
+      let(:data) {
+        {'data' => { 'level' => {
+                       'value' => false,
+                       'updateTime' => 1405102560
+        }}}
+      }
 
-      describe '#it caches the level' do
-        it 'stores interesting properties' do
-          command_class
-          expect(device.get_property(:level)).to eq [false, 1405102560]
+      describe '#build_from' do
+        it 'adds a property for level' do
+          command_class.build_from(data)
+          expect(command_class.level).to eq false
         end
       end
 
       describe '#process' do
+        before { command_class.build_from(data) }
+
         it 'does nothing when it processes no updates' do
           expect(command_class.process({})).to be_nil
         end

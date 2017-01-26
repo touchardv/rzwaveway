@@ -4,7 +4,7 @@ module RZWaveWay
   module CommandClasses
     describe Alarm do
       let(:device) { ZWaveDevice.new(create_id, create_device_data) }
-      let(:command_class) { Alarm.new({}, device) }
+      let(:command_class) { Alarm.new(device) }
 
       describe '#process' do
         it 'returns an alarm event' do

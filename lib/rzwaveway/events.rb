@@ -15,10 +15,6 @@ module RZWaveWay
 
   class AliveEvent < Event ; end
 
-  class NotAliveEvent < Event ; end
-
-  class DeadEvent < Event ; end
-
   class LevelEvent < Event ; end
 
   class MultiLevelEvent < LevelEvent ; end

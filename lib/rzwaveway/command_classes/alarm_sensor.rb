@@ -8,10 +8,6 @@ module RZWaveWay
       HEAT = 0x04
       WATER_LEAK = 0x05
 
-      def property_mappings
-        {}
-      end
-
       def process(updates)
         log.info updates
         nil

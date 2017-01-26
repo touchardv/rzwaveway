@@ -2,7 +2,6 @@ require 'spec_helper'
 
 module RZWaveWay
   describe ZWaveDevice do
-    let(:now) { Time.now }
     let(:device) do
       ZWaveDevice.new(create_id,
                       create_device_data({CommandClass::WAKEUP =>
@@ -35,38 +34,16 @@ module RZWaveWay
         expect(battery_device.last_contact_time).to eq 1390252000
       end
 
+      it 'sets the is failed flag' do
+        expect(ac_powered_device.is_failed).to eq false
+      end
+
       it 'sets the last contact time from data (device data)' do
         expect(ac_powered_device.last_contact_time).to eq 1390252000
       end
 
       it 'sets the name from data' do
         expect(device.name).to eq 'device name'
-      end
-    end
-
-    describe '#add_property' do
-      it 'stores a property' do
-        property = { name: 'prop1', value: 123, update_time: Time.now.to_i, read_only: true }
-        device.add_property(property)
-
-        expect(device.get_property('prop1')).not_to be_nil
-      end
-    end
-
-    describe '#properties' do
-      it 'returns the name and value of all properties' do
-        device.add_property({ name: 'prop1', value: 123, update_time: 1390252000 })
-        device.add_property({ name: 'prop2', value: 456, update_time: 1390252000 })
-
-        expect(device.properties).to eq([
-                                          {name: 'prop1', value: 123, update_time: 1390252000, read_only: true},
-                                          {name: 'prop2', value: 456, update_time: 1390252000, read_only: true}
-        ])
-      end
-
-      it 'does not include internal properties' do
-        device.add_property({ name: 'prop1', value: 123, update_time: 1390252000, internal: true })
-        expect(device.properties).to be_empty
       end
     end
 
@@ -113,73 +90,27 @@ module RZWaveWay
         expect(device.last_contact_time).to eq 1409490977
       end
 
-      it 'updates the last contact time' do
+      it 'generates an AliveEvent when last contact time was updated' do
+        now = Time.now.to_i
         updates = {
           'data.lastReceived' => {
             'name' => 'lastReceived',
-            'value' => 176428709,
+            'value' => 0,
             'type' => 'int',
             'invalidateTime' => 1390251561,
-            'updateTime' => 1409490977
-          },
-          'data.lastSend' => {
-            'name' => 'lastSend',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => 1409490970
-          }
-        }
-        device.process(updates)
-        expect(device.last_contact_time).to eq 1409490977
-      end
-
-      it 'does not generate an AliveEvent when last contact time is not updated' do
-        device.notify_contacted(now)
-        updates = {
-          'data.lastReceived' => {
-            'name' => 'lastReceived',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => 1409490970
-          },
-          'data.lastSend' => {
-            'name' => 'lastSend',
-            'value' => 176428709,
-            'type' => 'int',
-            'invalidateTime' => 1390251561,
-            'updateTime' => 1409490970
+            'updateTime' => now
           }
         }
         events = device.process(updates)
-        expect(events.size).to eq 0
+        expect(events.size).to eq 1
+        event = events[0]
+        expect(event.time).to eq now
       end
     end
 
-    describe '#update_status' do
-      it 'updates the status to :alive' do
-        device.send(:update_status, device.last_contact_time + 60)
-        expect(device.status_changed?).to eq true
-        expect(device.status).to eq :alive
-      end
-
-      it 'updates the status to :not_alive' do
-        device.send(:update_status, device.last_contact_time + 600)
-        expect(device.status_changed?).to eq true
-        expect(device.status).to eq :not_alive
-      end
-
-      it 'does not change the status' do
-        device.send(:update_status, device.last_contact_time + 6000)
-        expect(device.status_changed?).to eq false
-      end
-    end
-
-    describe '#to_json' do
-      it 'returns json' do
-        json = device.to_json
-        expect(json.size).not_to eq 0
+    describe '#to_hash' do
+      it 'returns a Hash' do
+        expect(device.to_hash.class).to eq Hash
       end
     end
   end

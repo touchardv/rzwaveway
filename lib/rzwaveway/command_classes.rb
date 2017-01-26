@@ -14,18 +14,28 @@ module RZWaveWay
     class Dummy
       include Singleton
 
+      def build_from(data)
+      end
+
       def process(updates)
+      end
+
+      def save_properties
+      end
+
+      def to_hash
+        {}
       end
     end
 
     class Factory
       include Singleton
 
-      def instantiate(id, data, device)
+      def instantiate(id, device)
         if CLASSES.has_key? id
-          return CLASSES[id].new(data, device)
+          CLASSES[id].new(device)
         else
-          return CommandClasses::Dummy.instance
+          CommandClasses::Dummy.instance
         end
       end
 
