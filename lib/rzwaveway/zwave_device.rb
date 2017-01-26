@@ -5,6 +5,7 @@ module RZWaveWay
     include PropertiesCache
 
     attr_reader :id
+    attr_reader :last_contact_time
 
     def initialize(id, data)
       @id = id
@@ -32,15 +33,19 @@ module RZWaveWay
         end
       end
       process_device_data(updates)
-      if properties[:last_contact_time].changed?
+      if @last_contact_time_changed
         events << AliveEvent.new(device_id: @id, time: last_contact_time)
+        @last_contact_time_changed = false
       end
       save_changes
       events
     end
 
     def notify_contacted(time)
-      properties[:last_contact_time].update(time.to_i, time.to_i)
+      if time > last_contact_time
+        @last_contact_time = time
+        @last_contact_time_changed = true
+      end
     end
 
     def state
@@ -79,7 +84,8 @@ module RZWaveWay
     def initialize_from data
       define_property(:name, 'data.givenName', true, data)
       define_property(:is_failed, 'data.isFailed', true, data)
-      define_property(:last_contact_time, 'data.lastReceived', true, data)
+      @last_contact_time = find('data.lastReceived.updateTime', data)
+      @last_contact_time_changed = false
 
       @command_classes = create_commandclasses_from data
       save_changes
@@ -109,8 +115,7 @@ module RZWaveWay
         when /^(?:data.)?isFailed/
           properties[:is_failed].update(value['value'], value['updateTime'])
         when /^(?:data.)?lastReceived/
-          last_contact_time = value['updateTime']
-          properties[:last_contact_time].update(last_contact_time, last_contact_time)
+          notify_contacted(value['updateTime'])
         end
       end
     end
