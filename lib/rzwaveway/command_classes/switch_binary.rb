@@ -17,12 +17,12 @@ module RZWaveWay
         end
       end
 
-      def get
-        RZWaveWay::ZWay.instance.execute(device.id, SWITCH_BINARY, :Get)
+      def level=(value)
+        RZWaveWay::ZWay.instance.execute(device.id, SWITCH_BINARY, :Set, value)
       end
 
-      def set(value)
-        RZWaveWay::ZWay.instance.execute(device.id, SWITCH_BINARY, :Set, value)
+      def refresh
+        RZWaveWay::ZWay.instance.execute(device.id, SWITCH_BINARY, :Get)
       end
     end
   end

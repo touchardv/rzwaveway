@@ -17,8 +17,8 @@ module RZWaveWay
         read_only: read_only
       }
       property = Property.new(options)
-      (class << self; self end).send(:define_method, property_name) { property.value }
       properties[property_name] = property
+      (class << self; self end).send(:define_method, property_name) { property.value }
     end
 
     def find(name, data)

@@ -9,6 +9,7 @@ module RZWaveWay
 
     def initialize(id, data)
       @id = id
+      @command_classes = {}
       initialize_from data
       log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
     end
@@ -48,37 +49,28 @@ module RZWaveWay
       end
     end
 
-    def state
-      hash = to_hash
-      @command_classes.values.each_with_object(hash) {|cc, hash| hash.merge!(cc.to_hash)}
-    end
-
     def refresh
       @command_classes.values.each do |command_class|
         command_class.refresh if command_class.respond_to? :refresh
       end
     end
 
-    def save_changes
-      save_properties
-      @command_classes.values.each {|cc| cc.save_properties}
+    def state
+      hash = to_hash
+      @command_classes.values.each_with_object(hash) {|cc, hash| hash.merge!(cc.to_hash)}
     end
 
     private
 
-    MAXIMUM_MISSED_CONTACT = 10
-
     def create_commandclasses_from data
-      cc_classes = {}
       data['instances']['0']['commandClasses'].each do |id, sub_tree|
         cc_id = id.to_i
         cc_class = CommandClasses::Factory.instance.instantiate(cc_id, self)
         cc_class.build_from(sub_tree)
-        cc_classes[cc_id] = cc_class
+        @command_classes[cc_id] = cc_class
         cc_class_name = cc_class.class.name.split('::').last
         (class << self; self end).send(:define_method, cc_class_name) { cc_class } unless cc_class_name == 'Dummy'
       end
-      cc_classes
     end
 
     def initialize_from data
@@ -87,7 +79,7 @@ module RZWaveWay
       @last_contact_time = find('data.lastReceived.updateTime', data)
       @last_contact_time_changed = false
 
-      @command_classes = create_commandclasses_from data
+      create_commandclasses_from data
       save_changes
     end
 
@@ -118,6 +110,11 @@ module RZWaveWay
           notify_contacted(value['updateTime'])
         end
       end
+    end
+
+    def save_changes
+      save_properties
+      @command_classes.values.each {|cc| cc.save_properties}
     end
   end
 end

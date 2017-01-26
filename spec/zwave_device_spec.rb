@@ -113,12 +113,5 @@ module RZWaveWay
         expect(device.to_hash.class).to eq Hash
       end
     end
-
-    describe '#to_json' do
-      it 'returns json' do
-        json = device.to_json
-        expect(json.size).not_to eq 0
-      end
-    end
   end
 end
