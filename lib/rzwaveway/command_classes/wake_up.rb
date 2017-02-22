@@ -10,6 +10,14 @@ module RZWaveWay
         device.notify_contacted(find('data.lastWakeup.value', data))
       end
 
+      def missed_contact_count(time = Time.now)
+        (elapsed_seconds_since_last_wakeup(time) / contact_frequency).to_i
+      end
+
+      def on_time?(time = Time.now)
+        elapsed_seconds_since_last_wakeup(time) < (contact_frequency * 1.2)
+      end
+
       def process(updates)
         if updates.keys.include?('data.lastWakeup')
           data = updates['data.lastWakeup']
@@ -21,6 +29,12 @@ module RZWaveWay
         end
         nil
         # TODO handle change of wake up interval value?
+      end
+
+      private
+
+      def elapsed_seconds_since_last_wakeup(time)
+        time.to_i - last_wakeup_time
       end
     end
   end
