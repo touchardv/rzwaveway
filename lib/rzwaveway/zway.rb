@@ -76,11 +76,12 @@ module RZWaveWay
       devices.each do |device_id, device|
         previous_status = device.status
 
-        device_events = []
         if updates_per_device.has_key? device_id
-          device_events = device.process updates_per_device[device_id]
+          device_updates = updates_per_device[device_id]
+          device.process(device_updates) do |event|
+            events << event
+          end
         end
-        events += device_events unless device_events.empty?
 
         if previous_status != device.update_status
           events << create_status_event_for(device)

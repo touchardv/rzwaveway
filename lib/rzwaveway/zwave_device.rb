@@ -28,20 +28,19 @@ module RZWaveWay
       @command_classes.has_key? command_class_id
     end
 
-    def process updates
-      events = []
+    def process(updates)
       updates_per_commandclass = group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
         if @command_classes.has_key? cc
-          event = @command_classes[cc].process(values)
-          events << event if event
+          @command_classes[cc].process(values) do |event|
+            yield event if event
+          end
         else
           log.warn "Could not find command class: '#{cc}'"
         end
       end
       process_device_data(updates)
       save_changes
-      events
     end
 
     def notify_contacted(time)

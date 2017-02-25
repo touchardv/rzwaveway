@@ -26,13 +26,14 @@ module RZWaveWay
           expect(command_class.process({})).to be_nil
         end
 
-        it 'returns a multi level event' do
+        it 'yields a multi level event' do
           updates = {
             'data.level' => {
               'value' => 66,
               'updateTime' => 1405102860
           }}
-          event = command_class.process(updates)
+          event = nil
+          command_class.process(updates) {|e| event = e}
           expect(event.class).to be RZWaveWay::MultiLevelEvent
           expect(event.level).to eq 66
           expect(event.device_id).to eq device.id

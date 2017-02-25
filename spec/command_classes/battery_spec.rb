@@ -27,14 +27,15 @@ module RZWaveWay
           expect(command_class.process({})).to be_nil
         end
 
-        it 'returns a battery event' do
+        it 'yields a battery event' do
           updates = {
             'data.last' => {
               'value' => 50,
               'type' => 'int',
               'updateTime' => 1409681762
           }}
-          event = command_class.process(updates)
+          event = nil
+          command_class.process(updates) {|e| event = e}
           expect(event.class).to be RZWaveWay::BatteryValueEvent
           expect(event.value).to eq 50
           expect(event.device_id).to eq device.id
