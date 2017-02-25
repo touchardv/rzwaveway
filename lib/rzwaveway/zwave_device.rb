@@ -6,12 +6,18 @@ module RZWaveWay
 
     attr_reader :id
     attr_reader :last_contact_time
+    attr_reader :status
 
     def initialize(id, data)
       @id = id
       @command_classes = {}
       initialize_from data
-      log.info "Created ZWaveDevice with name='#{name}' (id='#{id}')"
+      update_status
+      log.info "Created device with name='#{name}' status=#{status} (id='#{id}')"
+    end
+
+    def contact
+      RZWaveWay::ZWay.instance.run_zway_no_operation(id)
     end
 
     def contacts_controller_periodically?
@@ -34,18 +40,13 @@ module RZWaveWay
         end
       end
       process_device_data(updates)
-      if @last_contact_time_changed
-        events << AliveEvent.new(device_id: @id, time: last_contact_time)
-        @last_contact_time_changed = false
-      end
       save_changes
       events
     end
 
     def notify_contacted(time)
-      if time > last_contact_time
+      if time > @last_contact_time
         @last_contact_time = time
-        @last_contact_time_changed = true
       end
     end
 
@@ -58,6 +59,26 @@ module RZWaveWay
     def state
       hash = to_hash
       @command_classes.values.each_with_object(hash) {|cc, hash| hash.merge!(cc.to_hash)}
+    end
+
+    def update_status
+      @status = if contacts_controller_periodically?
+        if self.WakeUp.on_time?
+          :alive
+        elsif self.WakeUp.missed_contact_count < 10 # times
+          :inactive
+        else
+          :dead
+        end
+      else
+        if elapsed_minutes_since_last_contact > 60 # minutes
+          :dead
+        elsif elapsed_minutes_since_last_contact > 5  # minutes
+          :inactive
+        else
+          :alive
+        end
+      end
     end
 
     private
@@ -73,11 +94,17 @@ module RZWaveWay
       end
     end
 
+    def elapsed_minutes_since_last_contact(time = Time.now)
+      (time.to_i - last_contact_time) / 60
+    end
+
     def initialize_from data
       define_property(:name, 'data.givenName', true, data)
       define_property(:is_failed, 'data.isFailed', true, data)
-      @last_contact_time = find('data.lastReceived.updateTime', data)
-      @last_contact_time_changed = false
+      
+      last_received = find('data.lastReceived.updateTime', data)
+      last_send = find('data.lastSend.updateTime', data)
+      @last_contact_time = last_received > last_send ? last_received : last_send
 
       create_commandclasses_from data
       save_changes
@@ -106,7 +133,7 @@ module RZWaveWay
         case key
         when /^(?:data.)?isFailed/
           properties[:is_failed].update(value['value'], value['updateTime'])
-        when /^(?:data.)?lastReceived/
+        when /^(?:data.)?[lastSend|lastReceived]/
           notify_contacted(value['updateTime'])
         end
       end
