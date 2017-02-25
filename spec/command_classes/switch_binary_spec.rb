@@ -3,8 +3,8 @@ require 'spec_helper'
 module RZWaveWay
   module CommandClasses
     describe SwitchBinary do
-      let(:device) { ZWaveDevice.new(create_id, create_device_data) }
       let(:command_class) { SwitchBinary.new(device) }
+      let(:device) { ZWaveDevice.new(create_id, create_device_data) }
       let(:data) {
         {'data' => { 'level' => {
                        'value' => false,
@@ -12,16 +12,15 @@ module RZWaveWay
         }}}
       }
 
+      before { command_class.build_from(data) }
+
       describe '#build_from' do
         it 'adds a property for level' do
-          command_class.build_from(data)
           expect(command_class.level).to eq false
         end
       end
 
       describe '#process' do
-        before { command_class.build_from(data) }
-
         it 'does nothing when it processes no updates' do
           expect(command_class.process({})).to be_nil
         end
