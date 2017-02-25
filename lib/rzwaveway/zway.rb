@@ -13,7 +13,10 @@ module RZWaveWay
     attr_reader :log
 
     def initialize
+      @devices = {}
+      @event_handlers = {}
       @log = default_logger
+      @update_time = '0'
     end
 
     def execute(device_id, command_class, command_class_function, argument = nil)
@@ -49,9 +52,6 @@ module RZWaveWay
     end
 
     def start
-      @devices = {}
-      @event_handlers = {}
-      @update_time = '0'
       loop do
         results = get_zway_data_tree_updates
         if results.has_key?('devices')
