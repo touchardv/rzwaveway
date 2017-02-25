@@ -65,7 +65,7 @@ module RZWaveWay
             'data.lastWakeup' => {'value' => 1395247772, 'updateTime' => 1395247772},
             'data.lastSleep' => {'value' => 1395247772, 'updateTime' => 1395247772}
           }
-          event = command_class.process(updates)
+          command_class.process(updates)
           expect(device.last_contact_time).to eq 1395247772
         end
       end
