@@ -27,7 +27,7 @@ z_way.on_event(RZWaveWay::AliveEvent) {|event| puts "A device woke up" }
 z_way.on_event(RZWaveWay::LevelEvent) {|event| puts "A device got triggered" }
 while true do
   sleep 5
-  z_way.process_events
+  z_way.process
 end
 ```
 

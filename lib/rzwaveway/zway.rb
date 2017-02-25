@@ -68,7 +68,7 @@ module RZWaveWay
       @event_handlers[event] = listener
     end
 
-    def process_events
+    def process
       updates = get_zway_data_tree_updates
       updates_per_device = group_per_device updates
 
