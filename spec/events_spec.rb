@@ -14,7 +14,7 @@ module RZWaveWay
       end
 
       it 'adds a time if none is provided' do
-        event = AliveEvent.new(device_id: 123)
+        event = AliveDevice.new(device_id: 123)
         expect(event[:time]).not_to be_nil
       end
 

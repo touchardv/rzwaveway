@@ -30,6 +30,10 @@ module RZWaveWay
       clazz.new(device)
     end
 
+    def run_zway_no_operation device_id
+      run_zway "devices[#{device_id}].SendNoOperation()"
+    end
+
     def setup(options, *adapter_params)
       hostname = options[:hostname] || '127.0.0.1'
       port = options[:port] || 8083
@@ -66,7 +70,22 @@ module RZWaveWay
 
     def process_events
       updates = get_zway_data_tree_updates
-      events = devices_process updates
+      updates_per_device = group_per_device updates
+
+      events = []
+      devices.each do |device_id, device|
+        previous_status = device.status
+
+        device_events = []
+        if updates_per_device.has_key? device_id
+          device_events = device.process updates_per_device[device_id]
+        end
+        events += device_events unless device_events.empty?
+
+        if previous_status != device.update_status
+          events << create_status_event_for(device)
+        end
+      end
       deliver_to_handlers(events)
     end
 
@@ -78,6 +97,18 @@ module RZWaveWay
     def create_device(device_id, device_data_tree)
       if device_id > 1
         @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree)
+      end
+    end
+
+    def create_status_event_for(device)
+      log.info "Device '#{device.name}' is now #{device.status}"
+      case device.status
+      when :alive
+        AliveDevice.new(device_id: device.id, time: device.last_contact_time)
+      when :inactive
+        InactiveDevice.new(device_id: device.id)
+      when :dead
+        DeadDevice.new(device_id: device.id)
       end
     end
 
@@ -94,20 +125,6 @@ module RZWaveWay
           log.warn "No event handler for #{event.class}"
         end
       end
-    end
-
-    def devices_process updates
-      events = []
-      updates_per_device = group_per_device updates
-      updates_per_device.each do | id, updates |
-        if @devices[id]
-          device_events = @devices[id].process updates
-          events += device_events unless device_events.empty?
-        else
-          log.warn "Could not find device with id '#{id}'"
-        end
-      end
-      events
     end
 
     def group_per_device updates
@@ -170,10 +187,6 @@ module RZWaveWay
         command_path += "#{function_name}()"
       end
       run_zway command_path
-    end
-
-    def run_zway_no_operation device_id
-      run_zway "devices[#{device_id}].SendNoOperation()"
     end
 
     def run_zway command_path
