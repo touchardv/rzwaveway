@@ -102,7 +102,7 @@ module RZWaveWay
     end
 
     def create_status_event_for(device)
-      log.info "Device '#{device.name}' is now #{device.status}"
+      log.debug "Device '#{device.name}' is now #{device.status}"
       case device.status
       when :alive
         AliveDevice.new(device_id: device.id, time: device.last_contact_time)
