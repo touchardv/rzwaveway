@@ -130,6 +130,7 @@ module RZWaveWay
         case key
         when /^(?:data.)?isFailed/
           properties[:is_failed].update(value['value'], value['updateTime'])
+          notify_contacted(value['updateTime']) unless is_failed
         when /^(?:data.)?lastReceived/
           notify_contacted(value['updateTime'])
         end
