@@ -101,9 +101,7 @@ module RZWaveWay
       define_property(:name, 'data.givenName', true, data)
       define_property(:is_failed, 'data.isFailed', true, data)
       
-      last_received = find('data.lastReceived.updateTime', data)
-      last_send = find('data.lastSend.updateTime', data)
-      @last_contact_time = last_received > last_send ? last_received : last_send
+      @last_contact_time = find('data.lastReceived.updateTime', data)
 
       create_commandclasses_from data
       save_changes
@@ -132,7 +130,7 @@ module RZWaveWay
         case key
         when /^(?:data.)?isFailed/
           properties[:is_failed].update(value['value'], value['updateTime'])
-        when /^(?:data.)?[lastSend|lastReceived]/
+        when /^(?:data.)?lastReceived/
           notify_contacted(value['updateTime'])
         end
       end
