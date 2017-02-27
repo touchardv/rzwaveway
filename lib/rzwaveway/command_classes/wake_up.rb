@@ -11,11 +11,11 @@ module RZWaveWay
       end
 
       def missed_contact_count(time = Time.now)
-        (elapsed_seconds_since_last_wakeup(time) / contact_frequency).to_i
+        (elapsed_seconds_since_last_contact(time) / contact_frequency).to_i
       end
 
       def on_time?(time = Time.now)
-        elapsed_seconds_since_last_wakeup(time) < (contact_frequency * 1.2)
+        elapsed_seconds_since_last_contact(time) < (contact_frequency * 1.2)
       end
 
       def process(updates)
@@ -33,8 +33,8 @@ module RZWaveWay
 
       private
 
-      def elapsed_seconds_since_last_wakeup(time)
-        time.to_i - last_wakeup_time
+      def elapsed_seconds_since_last_contact(time)
+        time.to_i - device.last_contact_time
       end
     end
   end

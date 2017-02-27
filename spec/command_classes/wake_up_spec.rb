@@ -42,16 +42,26 @@ module RZWaveWay
       end
 
       describe '#on_time?' do
-        it 'returns true (wake up time not yet reached)' do
-          expect(command_class.on_time?(time + (contact_frequency - 1))).to eq true
+        context 'no contact with device during wake up interval' do
+          it 'returns true (wake up time not yet reached)' do
+            expect(command_class.on_time?(time + (contact_frequency - 1))).to eq true
+          end
+
+          it 'returns true (wake up time reached but with small latency' do
+            expect(command_class.on_time?(time + (contact_frequency + 2))).to eq true
+          end
+
+          it 'returns false' do
+            expect(command_class.on_time?(time + (contact_frequency * 1.5))).to eq false
+          end
         end
 
-        it 'returns true (wake up time reached but with small latency' do
-          expect(command_class.on_time?(time + (contact_frequency + 2))).to eq true
-        end
+        context 'contact with device during wake up interval' do
+          before { device.notify_contacted(time + 120) }
 
-        it 'returns false' do
-          expect(command_class.on_time?(time + (contact_frequency * 1.5))).to eq false
+          it 'return true' do
+            expect(command_class.on_time?(time + 120 + (contact_frequency - 1))).to eq true
+          end
         end
       end
 
