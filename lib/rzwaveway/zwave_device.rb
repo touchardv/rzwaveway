@@ -102,6 +102,7 @@ module RZWaveWay
       define_property(:is_failed, 'data.isFailed', true, data)
       
       @last_contact_time = find('data.lastReceived.updateTime', data)
+      notify_contacted(properties[:is_failed].update_time) unless is_failed
 
       create_commandclasses_from data
       save_changes
