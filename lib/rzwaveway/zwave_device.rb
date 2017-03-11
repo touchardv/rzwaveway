@@ -87,7 +87,7 @@ module RZWaveWay
         cc_class.build_from(sub_tree)
         @command_classes[cc_id] = cc_class
         cc_class_name = cc_class.class.name.split('::').last
-        (class << self; self end).send(:define_method, cc_class_name) { cc_class } unless cc_class_name == 'Dummy'
+        (class << self; self end).send(:define_method, cc_class_name) { cc_class } unless cc_class_name == 'Unsupported'
       end
     end
 

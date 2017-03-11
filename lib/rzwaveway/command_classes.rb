@@ -11,7 +11,7 @@ require_relative 'command_classes/wake_up'
 
 module RZWaveWay
   module CommandClasses
-    class Dummy
+    class Unsupported
       include Singleton
 
       def build_from(data)
@@ -35,7 +35,7 @@ module RZWaveWay
         if CLASSES.has_key? id
           CLASSES[id].new(device)
         else
-          CommandClasses::Dummy.instance
+          CommandClasses::Unsupported.instance
         end
       end
 
