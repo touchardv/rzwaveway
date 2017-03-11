@@ -34,6 +34,10 @@ module RZWaveWay
         expect(battery_device.last_contact_time).to eq 1390252000
       end
 
+      it 'sets the failure count' do
+        expect(ac_powered_device.failure_count).to eq 0
+      end
+
       it 'sets the is failed flag' do
         expect(ac_powered_device.is_failed).to eq false
       end

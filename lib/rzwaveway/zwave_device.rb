@@ -100,6 +100,7 @@ module RZWaveWay
     def initialize_from data
       define_property(:name, 'data.givenName', true, data)
       define_property(:is_failed, 'data.isFailed', true, data)
+      define_property(:failure_count, 'data.failureCount', true, data)
       
       @last_contact_time = find('data.lastReceived.updateTime', data)
       notify_contacted(properties[:is_failed].update_time) unless is_failed
@@ -129,6 +130,8 @@ module RZWaveWay
     def process_device_data(data)
       data.each do | key, value |
         case key
+        when /^(?:data.)?failureCount/
+          properties[:failure_count].update(value['value'], value['updateTime'])
         when /^(?:data.)?isFailed/
           properties[:is_failed].update(value['value'], value['updateTime'])
           notify_contacted(value['updateTime']) unless is_failed

@@ -13,7 +13,11 @@ module SpecHelpers
         'givenName' => {
           'value' => 'device name',
           'updateTime' => 0
-          },
+        },
+        'failureCount' => {
+          'value' => 0,
+          'updateTime' => 0
+        },
         'isFailed' => {
           'value' => false,
           'updateTime' => 0
