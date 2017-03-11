@@ -26,5 +26,13 @@ module RZWaveWay
 
     def build_from(data)
     end
+
+    def name
+      self.class.name.split('::').last
+    end
+    
+    def to_s
+      name
+    end
   end
 end

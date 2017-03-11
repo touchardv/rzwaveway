@@ -24,6 +24,12 @@ module RZWaveWay
       support_commandclass? CommandClass::WAKEUP
     end
 
+    def inspect
+      output = [to_s]
+      output += @command_classes.collect {|id, command_class| "#{id} - #{command_class}"}
+      output.join "\n"
+    end
+
     def support_commandclass?(command_class_id)
       @command_classes.has_key? command_class_id
     end
@@ -56,6 +62,10 @@ module RZWaveWay
     def state
       hash = to_hash
       @command_classes.values.each_with_object(hash) {|cc, hash| hash.merge!(cc.to_hash)}
+    end
+
+    def to_s
+      "#{id} (#{name}) - #{status} (#{Time.at(last_contact_time)})"
     end
 
     def update_status

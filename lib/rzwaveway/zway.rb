@@ -33,6 +33,12 @@ module RZWaveWay
       clazz.new(device)
     end
 
+    def inspect
+      content = to_s
+      devices.values.each {|device| content << "\n#{device}"}
+      content
+    end
+
     def run_zway_no_operation device_id
       run_zway "devices[#{device_id}].SendNoOperation()"
     end
@@ -88,6 +94,10 @@ module RZWaveWay
         end
       end
       deliver_to_handlers(events)
+    end
+
+    def to_s
+      "ZWay at '#{@base_uri}' with #{devices.count} device(s)"
     end
 
     private

@@ -26,6 +26,10 @@ module RZWaveWay
       def to_hash
         {}
       end
+
+      def to_s
+        'Unsupported'
+      end
     end
 
     class Factory
