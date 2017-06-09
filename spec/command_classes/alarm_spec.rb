@@ -7,8 +7,8 @@ module RZWaveWay
       let(:command_class) { Alarm.new(device) }
 
       describe '#process' do
-        it 'yields an alarm event' do
-          updates = File.read('spec/data/alarm.json')
+        it 'yields an alarm event (v1 event)' do
+          updates = File.read('spec/data/alarm_v1.json')
           updates = JSON.parse updates
           zway = ZWay.instance
           updates_per_device = zway.send(:group_per_device, updates)
@@ -16,8 +16,20 @@ module RZWaveWay
           
           event = nil
           command_class.process(updates_per_cc[113]) {|e| event = e}
-          expect(event.alarm_type).to eq 8
+          expect(event.alarm_type).to eq Alarm::TYPE_POWER_MANAGEMENT
           expect(event.level).to eq 2
+        end
+
+        it 'yields an alarm event' do
+          updates = File.read('spec/data/alarm.json')
+          updates = JSON.parse updates
+          zway = ZWay.instance
+          updates_per_device = zway.send(:group_per_device, updates)
+          updates_per_cc = device.send(:group_per_commandclass, updates_per_device[24])
+          
+          event = nil
+          command_class.process(updates_per_cc[113]) {|e| event = e}
+          expect(event.alarm_type).to eq Alarm::TYPE_BURGLAR
         end
       end
     end

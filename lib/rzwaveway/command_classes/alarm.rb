@@ -16,13 +16,22 @@ module RZWaveWay
       TYPE_CLOCK = 0x0b
 
       def process(updates)
-        if updates.keys.include?('data.V1event')
-          event = updates['data.V1event']
-
-          yield AlarmEvent.new(device_id: device.id,
-                               time: event['updateTime'],
-                               alarm_type: event['alarmType']['value'],
-                               level: event['level']['value'])
+        updates.each do |key, value|
+          if key == 'data.V1event'
+            yield AlarmEvent.new(device_id: device.id,
+                                 time: value['updateTime'],
+                                 alarm_type: value['alarmType']['value'],
+                                 level: value['level']['value'])
+          else
+            match_data = key.match(/^data.(\d+)/)
+            if match_data
+              alarm_type = match_data[1].to_i
+              yield AlarmEvent.new(device_id: device.id,
+                                   time: value['updateTime'],
+                                   alarm_type: alarm_type,
+                                   level: value['event']['value'])
+            end
+          end
         end
       end
     end

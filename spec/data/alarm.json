@@ -1,69 +1,69 @@
 {
-    "devices.12.instances.0.commandClasses.113.data.V1event": {
+  "devices.24.data.isAwake": {
+    "value": true,
+    "type": "bool",
+    "invalidateTime": 1496580849,
+    "updateTime": 1497033124
+  },
+  "devices.24.data.lastSend": {
+    "value": 34492540,
+    "type": "int",
+    "invalidateTime": 1496676167,
+    "updateTime": 1497033124
+  },
+  "devices.24.data.lastReceived": {
+    "value": 0,
+    "type": "int",
+    "invalidateTime": 1496580849,
+    "updateTime": 1497033124
+  },
+  "devices.24.instances.0.commandClasses.113.data.7": {
+    "value": null,
+    "type": "empty",
+    "typeString": {
+      "value": "Burglar",
+      "type": "string",
+      "invalidateTime": 1496581247,
+      "updateTime": 1496581248
+    },
+    "status": {
+      "value": 255,
+      "type": "int",
+      "invalidateTime": 1496581247,
+      "updateTime": 1497033124
+    },
+    "eventMask": {
+      "value": 265,
+      "type": "int",
+      "invalidateTime": 1496581247,
+      "updateTime": 1496581249
+    },
+    "event": {
+      "value": 8,
+      "type": "int",
+      "invalidateTime": 1496581247,
+      "updateTime": 1497033124
+    },
+    "eventString": {
+      "value": "Motion detected, location unknown",
+      "type": "string",
+      "invalidateTime": 1496581247,
+      "updateTime": 1497033124
+    },
+    "eventParameters": {
+      "value": [],
+      "type": "binary",
+      "invalidateTime": 1496581247,
+      "updateTime": 1497033124
+    },
+    "eventSequence": {
       "value": null,
       "type": "empty",
-      "alarmType": {
-        "value": 8,
-        "type": "int",
-        "invalidateTime": 1476129162,
-        "updateTime": 1476903673
-      },
-      "level": {
-        "value": 2,
-        "type": "int",
-        "invalidateTime": 1476129162,
-        "updateTime": 1476903673
-      },
-      "invalidateTime": 1476129162,
-      "updateTime": 1476903673
+      "invalidateTime": 1496676245,
+      "updateTime": 1496676246
     },
-    "devices.12.instances.0.commandClasses.113.data.8": {
-      "value": null,
-      "type": "empty",
-      "typeString": {
-        "value": "Power Management",
-        "type": "string",
-        "invalidateTime": 1476129182,
-        "updateTime": 1476129183
-      },
-      "status": {
-        "value": 255,
-        "type": "int",
-        "invalidateTime": 1476129182,
-        "updateTime": 1476903673
-      },
-      "eventMask": {
-        "value": 12,
-        "type": "int",
-        "invalidateTime": 1476129182,
-        "updateTime": 1476129183
-      },
-      "event": {
-        "value": 2,
-        "type": "int",
-        "invalidateTime": 1476129182,
-        "updateTime": 1476903673
-      },
-      "eventString": {
-        "value": "AC mains disconnected",
-        "type": "string",
-        "invalidateTime": 1476129182,
-        "updateTime": 1476903673
-      },
-      "eventParameters": {
-        "value": [ ],
-        "type": "binary",
-        "invalidateTime": 1476129182,
-        "updateTime": 1476903673
-      },
-      "eventSequence": {
-        "value": null,
-        "type": "empty",
-        "invalidateTime": 1476129182,
-        "updateTime": 1476129183
-      },
-      "invalidateTime": 1476129182,
-      "updateTime": 1476903673
-    },
- "updateTime": 1476903675
+    "invalidateTime": 1496581247,
+    "updateTime": 1497033124
+  },
+  "updateTime": 1497033128
 }
