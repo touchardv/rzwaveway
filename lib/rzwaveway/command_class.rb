@@ -8,6 +8,7 @@ module RZWaveWay
     SWITCH_MULTI_LEVEL = 38
     SENSOR_BINARY = 48
     SENSOR_MULTI_LEVEL = 49
+    METER = 50
     CONFIGURATION = 112
     ALARM = 113
     NOTIFICATION = ALARM
@@ -16,6 +17,7 @@ module RZWaveWay
     WAKEUP = 132
     ASSOCIATION = 133
     VERSION = 134
+    SECURITY = 152
     ALARM_SENSOR = 156
 
     attr_reader :device
