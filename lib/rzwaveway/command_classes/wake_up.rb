@@ -7,7 +7,8 @@ module RZWaveWay
         define_property(:last_sleep_time, 'data.lastSleep', true, data)
         define_property(:last_wakeup_time, 'data.lastWakeup', true, data)
 
-        device.notify_contacted(find('data.lastWakeup.value', data))
+        last_wakeup_time = find('data.lastWakeup.value', data)
+        device.notify_contacted(last_wakeup_time) unless last_wakeup_time.nil?
       end
 
       def missed_contact_count(time = Time.now)
