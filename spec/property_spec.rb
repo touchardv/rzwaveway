@@ -8,12 +8,17 @@ module RZWaveWay
       it 'returns false when no change is performed on property' do
         expect(property.changed?).to eq false
 
-        property.update(123, 10)
+        property.update(123, 0)
         expect(property.changed?).to eq false
       end
 
       it 'returns true when the value is changed' do
         property.update(456, 0)
+        expect(property.changed?).to eq true
+      end
+
+      it 'returns true when the update time changed' do
+        property.update(123, 10)
         expect(property.changed?).to eq true
       end
     end

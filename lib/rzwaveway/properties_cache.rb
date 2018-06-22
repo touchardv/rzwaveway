@@ -13,6 +13,20 @@ module RZWaveWay
       (class << self; self end).send(:define_method, name) { property.value }
     end
 
+    def properties
+      @properties ||= {}
+    end
+
+    def properties_changed?
+      properties.values.any? {|property| property.changed?}
+    end
+
+    def save_properties
+      properties.values.each {|property| property.save}
+    end
+
+    private
+
     def find(name, data)
       parts = name.split '.'
       result = data
@@ -21,14 +35,6 @@ module RZWaveWay
         result = result[part]
       end
       result
-    end
-
-    def properties
-      @properties ||= {}
-    end
-
-    def save_properties
-      properties.values.each {|property| property.save}
     end
   end
 end

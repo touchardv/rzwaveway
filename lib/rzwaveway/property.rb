@@ -10,7 +10,8 @@ module RZWaveWay
     end
 
     def changed?
-      @previous_value != @value
+      @previous_value != @value ||
+        @previous_update_time != @update_time
     end
 
     def read_only?
