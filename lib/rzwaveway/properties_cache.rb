@@ -1,24 +1,16 @@
 module RZWaveWay
   module PropertiesCache
-    def save_properties
-      properties.values.each {|property| property.save}
-    end
+    def define_property(name, key, read_only, data)
+      raise ArgumentError, "Property already defined: #{name}" if properties.has_key? name
 
-    def to_hash
-      properties.each_with_object({}) {|property, hash| hash[property[0]] = property[1].to_hash}
-    end
-
-    private
-
-    def define_property(property_name, key, read_only, data)
       options = {
         value: find("#{key}.value", data),
         update_time: find("#{key}.updateTime", data),
         read_only: read_only
       }
       property = Property.new(options)
-      properties[property_name] = property
-      (class << self; self end).send(:define_method, property_name) { property.value }
+      properties[name] = property
+      (class << self; self end).send(:define_method, name) { property.value }
     end
 
     def find(name, data)
@@ -33,6 +25,10 @@ module RZWaveWay
 
     def properties
       @properties ||= {}
+    end
+
+    def save_properties
+      properties.values.each {|property| property.save}
     end
   end
 end

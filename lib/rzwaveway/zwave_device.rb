@@ -151,7 +151,6 @@ module RZWaveWay
 
     def save_changes
       save_properties
-      @command_classes.values.each {|cc| cc.save_properties}
     end
   end
 end

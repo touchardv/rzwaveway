@@ -3,7 +3,7 @@ module RZWaveWay
     class Battery < CommandClass
 
       def build_from(data)
-        define_property(:battery_level, 'data.last', true, data)
+        device.define_property(:battery_level, 'data.last', true, data)
       end
 
       def process(updates)
@@ -11,7 +11,7 @@ module RZWaveWay
           data = updates['data.last']
           value = data['value']
           update_time = data['updateTime']
-          if @properties[:battery_level].update(value, update_time)
+          if device.properties[:battery_level].update(value, update_time)
             yield BatteryValueEvent.new(device_id: device.id, time: update_time, value: value)
           end
         end

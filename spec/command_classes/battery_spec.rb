@@ -17,7 +17,7 @@ module RZWaveWay
 
       describe '#build_from' do
         it 'adds the battery level property' do
-          expect(command_class.battery_level).to eq 60
+          expect(device.battery_level).to eq 60
         end
       end
 

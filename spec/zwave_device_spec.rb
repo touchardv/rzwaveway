@@ -95,9 +95,9 @@ module RZWaveWay
       end
     end
 
-    describe '#to_hash' do
+    describe '#properties' do
       it 'returns a Hash' do
-        expect(device.to_hash.class).to eq Hash
+        expect(device.properties.class).to eq Hash
       end
     end
   end

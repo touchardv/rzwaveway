@@ -1,7 +1,6 @@
 module RZWaveWay
   class CommandClass
     include Logger
-    include PropertiesCache
 
     BASIC = 32
     SWITCH_BINARY = 37

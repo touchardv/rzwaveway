@@ -16,7 +16,7 @@ module RZWaveWay
 
       describe '#build_from' do
         it 'adds a property for level' do
-          expect(command_class.level).to eq false
+          expect(device.level).to eq false
         end
       end
 
