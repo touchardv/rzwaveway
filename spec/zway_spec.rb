@@ -16,7 +16,7 @@ module RZWaveWay
     end
     let(:zway) do
       zway = ZWay.instance
-      zway.setup({ hostname: 'dummy' }, :test, http_stubs)
+      zway.setup({ hostname: 'dummy', polling_interval: 1 }, :test, http_stubs)
       zway
     end
 
