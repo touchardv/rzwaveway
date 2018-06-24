@@ -79,19 +79,38 @@ module RZWaveWay
     end
 
     describe '#process' do
-      it 'updates the last contact time (from lastReceived)' do
-        updates = {
+      let(:updates) {
+        {
           'data.lastReceived' => {
             'name' => 'lastReceived',
             'value' => 176428709,
             'type' => 'int',
             'invalidateTime' => 1390251561,
             'updateTime' => 1409490977
-
           }
         }
+      }
+
+      let(:name_update) {
+        {
+          'data.givenName' => {
+            'name' => 'givenName',
+            'value' => 'foobar',
+            'updateTime' => 1409490977
+          }
+        }
+      }
+
+      it 'updates the last contact time (from lastReceived)' do
         device.process(updates)
         expect(device.last_contact_time).to eq 1409490977
+      end
+
+      it 'generates a event when updated' do
+        events = []
+        device.process(name_update) {|event| events << event}
+        expect(events.size).to eq 1
+        expect(events.first).to be_a DeviceUpdatedEvent
       end
     end
 

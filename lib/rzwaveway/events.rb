@@ -17,6 +17,8 @@ module RZWaveWay
   class InactiveDevice < Event ; end
   class DeadDevice < Event ; end
 
+  class DeviceUpdatedEvent < Event ; end
+
   class LevelEvent < Event ; end
 
   class MultiLevelEvent < LevelEvent ; end

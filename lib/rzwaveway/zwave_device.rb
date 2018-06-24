@@ -44,7 +44,10 @@ module RZWaveWay
         end
       end
       process_device_data(updates)
-      save_changes
+      if properties_changed?
+        yield DeviceUpdatedEvent.new(device_id: id)
+        save_properties
+      end
     end
 
     def notify_contacted(time)
@@ -57,11 +60,6 @@ module RZWaveWay
       @command_classes.values.each do |command_class|
         command_class.refresh if command_class.respond_to? :refresh
       end
-    end
-
-    def state
-      hash = to_hash
-      @command_classes.values.each_with_object(hash) {|cc, hash| hash.merge!(cc.to_hash)}
     end
 
     def to_s
@@ -114,7 +112,7 @@ module RZWaveWay
       notify_contacted(properties[:is_failed].update_time) unless is_failed
 
       create_commandclasses_from data
-      save_changes
+      save_properties
     end
 
     def group_per_commandclass updates
@@ -140,6 +138,8 @@ module RZWaveWay
         case key
         when /^(?:data.)?failureCount/
           properties[:failure_count].update(value['value'], value['updateTime'])
+        when /^(?:data.)?givenName/
+          properties[:name].update(value['value'], value['updateTime'])
         when /^(?:data.)?isFailed/
           properties[:is_failed].update(value['value'], value['updateTime'])
           notify_contacted(value['updateTime']) unless is_failed
@@ -147,10 +147,6 @@ module RZWaveWay
           notify_contacted(value['updateTime'])
         end
       end
-    end
-
-    def save_changes
-      save_properties
     end
   end
 end
