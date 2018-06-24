@@ -9,7 +9,6 @@ module RZWaveWay
     include Singleton
     include Log4r
 
-    attr_reader :devices
     attr_reader :log
 
     def initialize
@@ -26,8 +25,12 @@ module RZWaveWay
       run_zway_function(device_id, command_class, function_name, argument)
     end
 
+    def find_device(device_id)
+      @devices[device_id.to_i]
+    end
+
     def find_extension(name, device_id)
-      device = @devices[device_id.to_i]
+      device = find_device(device_id)
       raise ArgumentError, "No device with id '#{device_id}'" unless device
       clazz = qualified_const_get "RZWaveWay::Extensions::#{name}"
       clazz.new(device)
@@ -35,7 +38,7 @@ module RZWaveWay
 
     def inspect
       content = to_s
-      devices.values.each {|device| content << "\n#{device}"}
+      @devices.values.each {|device| content << "\n#{device}"}
       content
     end
 
@@ -55,49 +58,40 @@ module RZWaveWay
         connection.adapter *adapter_params
       end
       @log = options[:logger] if options.has_key? :logger
+      @polling_interval = options[:polling_interval] || 10 # seconds
     end
 
     def start
-      loop do
-        results = get_zway_data_tree_updates
-        if results.has_key?('devices')
-          results['devices'].each {|device_id,device_data_tree| create_device(device_id.to_i, device_data_tree)}
-          break
-        else
-          sleep 1.0
-          log.warn 'No devices found at start-up, retrying'
+      @stop = false
+      @thread = Thread.new do
+        until @stop do
+          begin
+            updates = get_zway_data_tree_updates
+            if updates.has_key? 'devices'
+              create_devices updates
+            else
+              process updates
+            end
+            sleep @polling_interval
+          rescue Exception => ex
+            log.warn ex.message
+            log.warn ex.backtrace
+          end
         end
       end
+    end
+
+    def stop
+      @stop = true
+      @thread.join
     end
 
     def on_event(event, &listener)
       @event_handlers[event] = listener
     end
 
-    def process
-      updates = get_zway_data_tree_updates
-      updates_per_device = group_per_device updates
-
-      events = []
-      devices.each do |device_id, device|
-        previous_status = device.status
-
-        if updates_per_device.has_key? device_id
-          device_updates = updates_per_device[device_id]
-          device.process(device_updates) do |event|
-            events << event
-          end
-        end
-
-        if previous_status != device.update_status
-          events << create_status_event_for(device)
-        end
-      end
-      deliver_to_handlers(events)
-    end
-
     def to_s
-      "ZWay at '#{@base_uri}' with #{devices.count} device(s)"
+      "ZWay at '#{@base_uri}' with #{@devices.count} device(s)"
     end
 
     private
@@ -106,9 +100,17 @@ module RZWaveWay
     RUN_BASE_PATH='/ZWaveAPI/Run/'
 
     def create_device(device_id, device_data_tree)
-      if device_id > 1
-        @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree)
+      @devices[device_id] = ZWaveDevice.new(device_id, device_data_tree)
+    end
+
+    def create_devices(updates)
+      events = []
+      updates['devices'].each do |device_id,device_data_tree|
+        next if device_id == '1'
+        device = create_device(device_id.to_i, device_data_tree)
+        events << DeviceDiscoveredEvent.new(device_id: device.id)
       end
+      deliver_to_handlers events
     end
 
     def create_status_event_for(device)
@@ -163,6 +165,27 @@ module RZWaveWay
       results
     end
 
+    def process(updates)
+      updates_per_device = group_per_device updates
+
+      events = []
+      @devices.each do |device_id, device|
+        previous_status = device.status
+
+        if updates_per_device.has_key? device_id
+          device_updates = updates_per_device[device_id]
+          device.process(device_updates) do |event|
+            events << event
+          end
+        end
+
+        if previous_status != device.update_status
+          events << create_status_event_for(device)
+        end
+      end
+      deliver_to_handlers(events)
+    end
+
     def qualified_const_get(str)
       path = str.to_s.split('::')
       from_root = path[0].empty?
@@ -198,7 +221,7 @@ module RZWaveWay
         uri = URI.encode(@base_uri + RUN_BASE_PATH + command_path, '[]')
         response = @connection.get(uri)
         unless response.success?
-          log.error(response.status)
+          log.error("run_zway() failed with status: #{response.status}")
           log.error(response.body)
         end
       rescue StandardError => e

@@ -13,6 +13,7 @@ module RZWaveWay
 
   class AlarmEvent < Event ; end
 
+  class DeviceDiscoveredEvent < Event ; end
   class DeviceStatusUpdatedEvent < Event ; end
   class DeviceUpdatedEvent < Event ; end
 

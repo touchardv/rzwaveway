@@ -14,16 +14,9 @@ z_way.setup(hostname: '192.168.1.123', port: 8083)
 z_way.start
 ```
 
-### List the devices
-```
-z_way.devices.each do |device_id,device|
-  puts device.build_json
-end
-```
-
 ### Listen to events
 ```
-z_way.on_event(RZWaveWay::AliveEvent) {|event| puts "A device woke up" }
+z_way.on_event(RZWaveWay::DeviceDiscoveredEvent) {|event| puts "A device was discovered" }
 z_way.on_event(RZWaveWay::LevelEvent) {|event| puts "A device got triggered" }
 while true do
   sleep 5

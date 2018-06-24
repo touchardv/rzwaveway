@@ -2,7 +2,18 @@ require 'spec_helper'
 
 module RZWaveWay
   describe ZWay do
-    let(:http_stubs) { Faraday::Adapter::Test::Stubs.new }
+    let(:device_data) {
+      {
+        'devices' => {
+          '123' => create_device_data
+        }
+      }
+    }
+    let(:http_stubs) do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.get('/ZWaveAPI/Data/0') {|env| [200, {}, device_data.to_json]}
+      stubs
+    end
     let(:zway) do
       zway = ZWay.instance
       zway.setup({ hostname: 'dummy' }, :test, http_stubs)
@@ -11,20 +22,32 @@ module RZWaveWay
 
     describe '#start' do
       it 'starts the library' do
-        http_stubs.get('/ZWaveAPI/Data/0') {|env| [200, {}, { devices: {}}.to_json]}
+        events = []
+        zway.on_event(RZWaveWay::DeviceDiscoveredEvent) {|event| events << event }
         zway.start
-        expect(zway.devices.size).to eq 0
-      end
 
-      it 'starts the library, even when ZWay HTTP is ready later' do
-        Thread.new do
-          sleep(1)
-          http_stubs.get('/ZWaveAPI/Data/0') {|env| [200, {}, '{}']}
-          sleep(2)
-          http_stubs.get('/ZWaveAPI/Data/') {|env| [200, {}, { devices: {}}.to_json]}
+        sleep 1
+        expect(events.size).to eq 1
+        expect(events.first['device_id']).to eq 123
+
+        zway.stop
+      end
+    end
+
+    context 'started' do
+      before { zway.start }
+      after { zway.stop }
+
+      describe '#find_device' do
+        it 'returns a device' do
+          device = zway.find_device(123)
+          expect(device).to be_a ZWaveDevice
         end
-        zway.start
-        expect(zway.devices.size).to eq 0
+
+        it 'returns nil for an unknown device' do
+          device = zway.find_device(666)
+          expect(device).to be_nil
+        end
       end
     end
   end
