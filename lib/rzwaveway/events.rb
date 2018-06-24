@@ -13,10 +13,7 @@ module RZWaveWay
 
   class AlarmEvent < Event ; end
 
-  class AliveDevice < Event ; end
-  class InactiveDevice < Event ; end
-  class DeadDevice < Event ; end
-
+  class DeviceStatusUpdatedEvent < Event ; end
   class DeviceUpdatedEvent < Event ; end
 
   class LevelEvent < Event ; end
