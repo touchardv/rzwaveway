@@ -67,22 +67,10 @@ module RZWaveWay
     end
 
     def update_status
-      @status = if contacts_controller_periodically?
-        if self.WakeUp.on_time?
-          :alive
-        elsif self.WakeUp.missed_contact_count < 10 # times
-          :inactive
-        else
-          :dead
-        end
+      @status = if is_failed
+        :failed
       else
-        if elapsed_minutes_since_last_contact > 60 # minutes
-          :dead
-        elsif elapsed_minutes_since_last_contact > 5  # minutes
-          :inactive
-        else
-          :alive
-        end
+        :ok
       end
     end
 
@@ -97,10 +85,6 @@ module RZWaveWay
         cc_class_name = cc_class.class.name.split('::').last
         (class << self; self end).send(:define_method, cc_class_name) { cc_class } unless cc_class_name == 'Unsupported'
       end
-    end
-
-    def elapsed_minutes_since_last_contact(time = Time.now)
-      (time.to_i - last_contact_time) / 60
     end
 
     def initialize_from data

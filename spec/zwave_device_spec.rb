@@ -114,6 +114,19 @@ module RZWaveWay
       end
     end
 
+    describe '#update_status' do
+      it 'returns ok when not failed' do
+        status = device.update_status
+        expect(status).to eq :ok
+      end
+
+      it 'returns failed' do
+        device.properties[:is_failed].update(true, 666)
+        status = device.update_status
+        expect(status).to eq :failed
+      end
+    end
+
     describe '#properties' do
       it 'returns a Hash' do
         expect(device.properties.class).to eq Hash
