@@ -22,7 +22,7 @@ module RZWaveWay
       end
 
       def level
-        case @device.SwitchMultiLevel.level
+        case @device.level
         when DISABLED
           :disabled
         when STROBE
