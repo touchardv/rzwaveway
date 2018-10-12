@@ -38,7 +38,13 @@ module RZWaveWay
       updates_per_commandclass = group_per_commandclass updates
       updates_per_commandclass.each do |cc, values|
         if @command_classes.has_key? cc
-          @command_classes[cc].process(values) {|event| yield event}
+          begin
+            @command_classes[cc].process(values) {|event| yield event}
+          rescue Exception => ex
+            log.error "ZWaveDevice::process() failed: #{ex.message}"
+            log.error ex.backtrace
+            log.error values
+          end
         else
           log.warn "Could not find command class: '#{cc}'"
         end
